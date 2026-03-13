@@ -3,700 +3,2554 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Git Mentor Pro - Interactive Environment</title>
+    <title>Git Mentor Pro — Complete Interactive Git Course</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body {
-            background-color: #0f172a;
-            color: #e2e8f0;
-            font-family: 'Fira Code', monospace;
+        :root {
+            --bg-primary: #0a0e1a;
+            --bg-secondary: #111827;
+            --bg-tertiary: #1e293b;
+            --border: #334155;
+            --text-primary: #e2e8f0;
+            --text-secondary: #94a3b8;
+            --accent: #10b981;
+            --accent-dim: #065f46;
         }
-        .terminal-output {
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: 'Inter', system-ui, sans-serif;
+            overflow: hidden;
+            height: 100vh;
+        }
+        .font-mono { font-family: 'JetBrains Mono', 'Fira Code', monospace; }
+        .terminal-wrap {
             scrollbar-width: thin;
             scrollbar-color: #475569 #1e293b;
         }
-        .terminal-output::-webkit-scrollbar {
-            width: 8px;
+        .terminal-wrap::-webkit-scrollbar { width: 6px; }
+        .terminal-wrap::-webkit-scrollbar-track { background: transparent; }
+        .terminal-wrap::-webkit-scrollbar-thumb { background-color: #475569; border-radius: 20px; }
+        .sidebar-wrap::-webkit-scrollbar { width: 5px; }
+        .sidebar-wrap::-webkit-scrollbar-track { background: transparent; }
+        .sidebar-wrap::-webkit-scrollbar-thumb { background-color: #334155; border-radius: 20px; }
+        .prompt-user { color: #34d399; }
+        .prompt-at { color: #64748b; }
+        .prompt-host { color: #60a5fa; }
+        .prompt-sep { color: #475569; }
+        .prompt-path { color: #fbbf24; }
+        .prompt-branch { color: #f472b6; }
+        .prompt-dollar { color: #94a3b8; }
+        .cmd-text { color: #e2e8f0; }
+        .out-error { color: #f87171; }
+        .out-success { color: #34d399; }
+        .out-warning { color: #fbbf24; }
+        .out-info { color: #94a3b8; }
+        .out-hash { color: #fbbf24; }
+        .out-branch { color: #34d399; }
+        .out-added { color: #34d399; }
+        .out-removed { color: #f87171; }
+        .out-header { color: #60a5fa; }
+        @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+        #terminal-input { caret-color: #10b981; }
+        #terminal-input:focus { outline: none; }
+        .flash-success { animation: flashGreen 0.6s ease-out; }
+        .flash-error { animation: flashRed 0.4s ease-out; }
+        @keyframes flashGreen {
+            0% { background-color: rgba(16,185,129,0.2); }
+            100% { background-color: transparent; }
         }
-        .terminal-output::-webkit-scrollbar-track {
-            background: #1e293b;
+        @keyframes flashRed {
+            0% { background-color: rgba(248,113,113,0.15); }
+            100% { background-color: transparent; }
         }
-        .terminal-output::-webkit-scrollbar-thumb {
-            background-color: #475569;
-            border-radius: 20px;
+        .progress-fill { transition: width 0.5s ease-in-out; }
+        .hint-box {
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            border: 1px solid #2dd4bf33;
         }
-        .prompt-user { color: #10b981; font-weight: bold; }
-        .prompt-host { color: #3b82f6; font-weight: bold; }
-        .prompt-path { color: #eab308; font-weight: bold; }
-        .prompt-branch { color: #f43f5e; font-weight: bold; }
-        
+        .concept-box {
+            background: linear-gradient(135deg, rgba(99,102,241,0.08), rgba(139,92,246,0.08));
+            border-left: 3px solid #818cf8;
+        }
         select {
             background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%2394a3b8' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
             background-position: right 0.5rem center;
             background-repeat: no-repeat;
             background-size: 1.5em 1.5em;
             padding-right: 2.5rem;
-            -webkit-print-color-adjust: exact;
-            print-color-adjust: exact;
             appearance: none;
         }
+        .level-badge-beginner { background: #065f46; color: #6ee7b7; border: 1px solid #10b981; }
+        .level-badge-intermediate { background: #1e3a5f; color: #93c5fd; border: 1px solid #3b82f6; }
+        .level-badge-advanced { background: #4c1d95; color: #c4b5fd; border: 1px solid #8b5cf6; }
+        .task-number {
+            width: 24px; height: 24px;
+            display: inline-flex; align-items: center; justify-content: center;
+            border-radius: 50%; font-size: 11px; font-weight: 700;
+            background: #1e293b; border: 1px solid #475569; color: #94a3b8;
+        }
+        .task-number.done { background: #065f46; border-color: #10b981; color: #6ee7b7; }
+        .task-number.active { background: #1e3a5f; border-color: #3b82f6; color: #93c5fd; }
     </style>
 </head>
-<body class="overflow-hidden flex flex-col h-screen">
+<body class="flex flex-col h-screen">
 
-<div class="flex flex-col h-full p-4 md:p-6 lg:p-8">
-    <!-- Header & Controls -->
-    <header class="mb-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+<!-- HEADER -->
+<header class="flex-shrink-0 bg-[#111827] border-b border-slate-700/60 px-4 py-3 flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
+    <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-lg bg-emerald-600 flex items-center justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><line x1="1.05" y1="12" x2="7" y2="12"/><line x1="17.01" y1="12" x2="22.96" y2="12"/></svg>
+        </div>
         <div>
-            <h1 class="text-2xl font-bold text-white flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-emerald-500"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>
-                Git Mentor Pro
-            </h1>
-            <p class="text-slate-400 text-sm">Interactive Git Learning Platform</p>
+            <h1 class="text-lg font-bold text-white leading-tight">Git Mentor Pro</h1>
+            <p class="text-[11px] text-slate-400">Complete Interactive Git Course · 24 Modules · Beginner → Advanced</p>
         </div>
-        
-        <div class="flex items-center gap-3 w-full md:w-auto">
-            <label for="module-select" class="text-sm text-slate-400 whitespace-nowrap">Jump to Topic:</label>
-            <select id="module-select" class="bg-slate-800 border border-slate-600 text-white text-sm rounded-lg focus:ring-emerald-500 focus:border-emerald-500 block w-full md:w-64 p-2 outline-none">
-                <option value="workflow-1">1. Start from Scratch</option>
-                <option value="workflow-2">2. Existing Projects (Clone/Push/Pull)</option>
-                <option value="history">3. Advanced Logs & History</option>
-                <option value="modify">4. Modifying Commits (Amend/Reset)</option>
-                <option value="ignore">5. Ignoring Files (.gitignore)</option>
-                <option value="security">6. Security & GPG Signatures</option>
-                <option value="tags">7. Tagging & Releases</option>
-                <option value="diff">8. Viewing Changes (Diff/Show)</option>
-            </select>
-            <button id="load-module-btn" class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">Load</button>
-        </div>
-    </header>
-
-    <div class="flex flex-1 gap-4 overflow-hidden">
-        <!-- Main Terminal -->
-        <main class="flex-1 bg-slate-900 rounded-lg border border-slate-700 shadow-2xl flex flex-col overflow-hidden">
-            <div class="bg-slate-800 px-4 py-2 border-b border-slate-700 flex items-center gap-2">
-                <div class="flex gap-1.5">
-                    <div class="w-3 h-3 rounded-full bg-red-500"></div>
-                    <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
-                    <div class="w-3 h-3 rounded-full bg-green-500"></div>
-                </div>
-                <div class="text-xs text-slate-400 ml-2 font-mono">bash — git-environment</div>
-            </div>
-
-            <div id="terminal-output" class="flex-1 p-4 overflow-y-auto font-mono text-sm terminal-output whitespace-pre-wrap leading-relaxed">
-                <div class="text-emerald-400 mb-2">Welcome to the Git Mentor Pro Platform.</div>
-                <div class="text-slate-400 mb-4 italic text-xs">Environment Initialized. Follow the User Guide on the right to proceed.</div>
-            </div>
-
-            <div class="bg-slate-900 border-t border-slate-800 p-4 flex items-center gap-2">
-                <div id="prompt-container" class="flex items-center">
-                    <span class="prompt-user">user</span><span class="text-slate-300">@</span><span class="prompt-host">git-bash</span> <span id="prompt-path" class="prompt-path">~</span><span id="prompt-branch-container"></span><span class="text-slate-300 ml-1">$</span>
-                </div>
-                <input type="text" id="terminal-input" autofocus class="flex-1 bg-transparent border-none outline-none text-slate-200 font-mono caret-emerald-500" autocomplete="off" spellcheck="false">
-            </div>
-        </main>
-
-        <!-- Sidebar (User Guide) -->
-        <aside id="user-guide-panel" class="w-80 bg-slate-800/50 rounded-lg border border-slate-700 p-4 hidden lg:flex flex-col gap-4 overflow-y-auto">
-            <div class="border-b border-slate-700 pb-2 flex justify-between items-center">
-                <h2 class="text-lg font-bold text-white">User Guide</h2>
-                <span id="lesson-progress" class="text-xs text-emerald-400 font-mono"></span>
-            </div>
-            
-            <div id="guide-content" class="text-slate-300 text-sm leading-relaxed flex-1">
-                <!-- Guide content injected here -->
-            </div>
-
-            <div class="mt-auto pt-4 border-t border-slate-700/50">
-                <div class="text-[10px] font-bold text-slate-500 mb-2 uppercase tracking-wide">Environment State</div>
-                <div id="repo-state" class="bg-slate-900/80 p-3 rounded text-[11px] font-mono border border-slate-700/50 text-slate-300">
-                    <!-- State injected here -->
-                </div>
-            </div>
-        </aside>
     </div>
+    <div class="flex items-center gap-2 w-full md:w-auto">
+        <select id="module-select" class="font-mono bg-slate-800 border border-slate-600 text-white text-xs rounded-lg focus:ring-emerald-500 focus:border-emerald-500 block w-full md:w-72 p-2 outline-none">
+        </select>
+        <button id="load-module-btn" class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-lg text-xs font-semibold transition-colors whitespace-nowrap">Load</button>
+        <button id="reset-btn" title="Reset current module" class="bg-slate-700 hover:bg-slate-600 text-white px-3 py-2 rounded-lg text-xs transition-colors">↻</button>
+    </div>
+</header>
+
+<!-- MAIN CONTENT -->
+<div class="flex flex-1 overflow-hidden">
+
+    <!-- TERMINAL -->
+    <main class="flex-1 flex flex-col overflow-hidden">
+        <!-- Terminal Title Bar -->
+        <div class="bg-[#1a1f2e] px-4 py-1.5 border-b border-slate-700/40 flex items-center gap-2 flex-shrink-0">
+            <div class="flex gap-1.5">
+                <div class="w-3 h-3 rounded-full bg-[#ff5f57]"></div>
+                <div class="w-3 h-3 rounded-full bg-[#febc2e]"></div>
+                <div class="w-3 h-3 rounded-full bg-[#28c840]"></div>
+            </div>
+            <span class="font-mono text-[11px] text-slate-500 ml-2">bash — git-learning-env</span>
+            <div class="ml-auto flex items-center gap-2">
+                <span id="connection-badge" class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-900/50 text-emerald-400 border border-emerald-800/50">● Ready</span>
+            </div>
+        </div>
+
+        <!-- Terminal Output -->
+        <div id="terminal-output" class="flex-1 p-4 overflow-y-auto font-mono text-[13px] terminal-wrap leading-relaxed bg-[#0a0e1a]">
+        </div>
+
+        <!-- Terminal Input Line -->
+        <div class="bg-[#0d1117] border-t border-slate-800/60 px-4 py-3 flex items-center gap-2 flex-shrink-0">
+            <div id="prompt-display" class="flex items-center gap-0 text-[13px] font-mono whitespace-nowrap flex-shrink-0">
+                <span class="prompt-user">user</span><span class="prompt-at">@</span><span class="prompt-host">git-env</span><span class="prompt-sep">:</span><span id="prompt-path" class="prompt-path">~</span><span id="prompt-branch-display"></span><span class="prompt-dollar ml-1">$</span>
+            </div>
+            <input type="text" id="terminal-input" autofocus class="flex-1 bg-transparent border-none outline-none text-slate-200 font-mono text-[13px] ml-1" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Type a git command...">
+        </div>
+    </main>
+
+    <!-- SIDEBAR -->
+    <aside id="sidebar" class="w-[380px] border-l border-slate-700/40 bg-[#111827] hidden lg:flex flex-col overflow-hidden">
+        
+        <!-- Progress Bar -->
+        <div class="px-4 pt-3 pb-2 border-b border-slate-700/40 flex-shrink-0">
+            <div class="flex justify-between items-center mb-1.5">
+                <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Progress</span>
+                <span id="progress-text" class="text-xs font-mono text-emerald-400">0 / 0</span>
+            </div>
+            <div class="w-full bg-slate-800 rounded-full h-1.5">
+                <div id="progress-bar" class="progress-fill bg-emerald-500 h-1.5 rounded-full" style="width: 0%"></div>
+            </div>
+        </div>
+
+        <!-- Guide Content -->
+        <div id="guide-content" class="flex-1 overflow-y-auto sidebar-wrap px-4 py-3">
+        </div>
+
+        <!-- Hint & Actions -->
+        <div class="px-4 py-3 border-t border-slate-700/40 flex-shrink-0 space-y-2">
+            <button id="hint-btn" class="w-full bg-amber-900/30 hover:bg-amber-900/50 border border-amber-700/40 text-amber-300 text-xs font-semibold py-2 rounded-lg transition-colors flex items-center justify-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a7 7 0 0 1 7 7c0 2.38-1.19 4.47-3 5.74V17a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 0 1 7-7z"/><line x1="9" y1="21" x2="15" y2="21"/></svg>
+                Show Hint
+            </button>
+            <div id="hint-display" class="hidden hint-box p-3 rounded-lg text-[11px] font-mono text-teal-300 leading-relaxed"></div>
+        </div>
+
+        <!-- Env State -->
+        <div class="px-4 py-3 border-t border-slate-700/40 flex-shrink-0">
+            <div class="text-[10px] font-bold text-slate-500 mb-2 uppercase tracking-wider">Repository State</div>
+            <div id="repo-state" class="bg-slate-900/60 p-2.5 rounded text-[11px] font-mono border border-slate-700/40 text-slate-400 grid grid-cols-2 gap-1.5"></div>
+        </div>
+    </aside>
 </div>
 
 <script>
-    /**
-     * ADVANCED GIT ENGINE CORE
-     */
-    class GitEngine {
-        constructor() {
-            this.reset();
+// ============================================================
+//  GIT ENGINE — High-Fidelity Simulation
+// ============================================================
+class GitEngine {
+    constructor() { this.reset(); }
+
+    reset() {
+        this.fs = {};
+        this.isGitInited = false;
+        this.staging = [];
+        this.commits = [];
+        this.branches = {};
+        this.currentBranch = 'main';
+        this.head = null;
+        this.tags = {};
+        this.remotes = {};
+        this.config = {};
+        this.stashes = [];
+        this.gpgConfigured = false;
+        this.dir = '~';
+        this.committedFiles = {};
+        this.modifiedFiles = new Set();
+        this.deletedStagedFiles = [];
+    }
+
+    _genId() { return Math.random().toString(16).substring(2, 9); }
+
+    _getIgnoredPatterns() {
+        if (!this.fs['.gitignore']) return [];
+        return this.fs['.gitignore'].content.split('\n').map(l => l.trim()).filter(l => l && !l.startsWith('#'));
+    }
+
+    _isIgnored(filename) {
+        return this._getIgnoredPatterns().some(p => {
+            if (p.endsWith('/')) return filename.startsWith(p);
+            if (p.startsWith('*.')) return filename.endsWith(p.substring(1));
+            if (p.startsWith('**/')) return filename.includes(p.substring(3));
+            return filename === p;
+        });
+    }
+
+    _isCommitted(filename) {
+        return this.commits.some(c => c.files.includes(filename));
+    }
+
+    init() {
+        if (this.isGitInited) return 'Reinitialized existing Git repository in .git/';
+        this.isGitInited = true;
+        this.fs['.git'] = { type: 'dir' };
+        const defaultBranch = this.config['init.defaultBranch'] || 'main';
+        this.currentBranch = defaultBranch;
+        this.branches[defaultBranch] = null;
+        const d = this.dir === '~' ? '/home/user/project' : this.dir;
+        return `Initialized empty Git repository in ${d}/.git/`;
+    }
+
+    status() {
+        if (!this.isGitInited) return { error: true, text: 'fatal: not a git repository (or any of the parent directories): .git' };
+        let lines = [];
+        lines.push(`On branch ${this.currentBranch}`);
+        if (!this.head) lines.push('\nNo commits yet\n');
+        else lines.push('');
+
+        const staged = [...this.staging];
+        const allFiles = Object.keys(this.fs).filter(f => f !== '.git');
+        const untracked = allFiles.filter(f => !this.staging.includes(f) && !this._isCommitted(f) && !this._isIgnored(f));
+        const modified = allFiles.filter(f => this._isCommitted(f) && !this.staging.includes(f) && this.modifiedFiles.has(f));
+
+        if (staged.length === 0 && untracked.length === 0 && modified.length === 0) {
+            lines.push('nothing to commit, working tree clean');
+            return { error: false, text: lines.join('\n') };
         }
 
-        reset() {
-            this.fs = {}; 
-            this.isGitInited = false;
-            this.staging = []; 
-            this.commits = []; 
-            this.branches = { 'master': null };
-            this.currentBranch = 'master';
-            this.head = null; 
-            this.tags = {};
-            this.remotes = {};
-            this.config = { 'user.name': 'Learner', 'user.email': 'learner@git.com' };
-            this.gpgConfigured = false;
-        }
-
-        getIgnoredPatterns() {
-            if (!this.fs['.gitignore']) return [];
-            return this.fs['.gitignore'].content.split('\n').map(l => l.trim()).filter(l => l && !l.startsWith('#'));
-        }
-
-        isIgnored(filename) {
-            const patterns = this.getIgnoredPatterns();
-            return patterns.some(p => {
-                if (p.endsWith('/')) return filename.startsWith(p);
-                if (p.startsWith('*.')) return filename.endsWith(p.substring(1));
-                return filename === p;
+        if (staged.length > 0) {
+            lines.push('Changes to be committed:');
+            lines.push('  (use "git restore --staged <file>..." to unstage)');
+            staged.forEach(f => {
+                const isNew = !this._isCommitted(f);
+                lines.push(`\t${isNew ? 'new file' : 'modified'}:   ${f}`);
             });
+            lines.push('');
         }
 
-        init(bare = false) {
-            if (this.isGitInited) return "Reinitialized existing Git repository";
-            this.isGitInited = true;
-            this.fs['.git'] = { type: 'dir' };
-            this.branches['master'] = null;
-            return bare ? "Initialized empty Git repository in /bare-repo.git/" : "Initialized empty Git repository in /work/.git/";
+        if (modified.length > 0) {
+            lines.push('Changes not staged for commit:');
+            lines.push('  (use "git add <file>..." to update what will be committed)');
+            modified.forEach(f => lines.push(`\tmodified:   ${f}`));
+            lines.push('');
         }
 
-        clone(url) {
-            this.init();
-            this.remotes['origin'] = url;
-            this.createFile('README.md', '# Project');
-            this.add('README.md');
-            this.commit('Initial commit from remote');
-            return `Cloning into 'project'...\nremote: Enumerating objects: 3, done.\nremote: Total 3 (delta 0), reused 0 (delta 0)\nReceiving objects: 100% (3/3), done.`;
+        if (untracked.length > 0) {
+            lines.push('Untracked files:');
+            lines.push('  (use "git add <file>..." to include in what will be committed)');
+            untracked.forEach(f => lines.push(`\t${f}`));
+            lines.push('');
         }
 
-        status() {
-            if (!this.isGitInited) return "fatal: not a git repository";
-            let output = `On branch ${this.currentBranch}\n`;
-            if (this.head === null) output += "No commits yet\n";
-            output += "\n";
-            
-            const trackedFiles = this.staging;
-            const allFiles = Object.keys(this.fs).filter(f => f !== '.git');
-            const untrackedFiles = allFiles.filter(f => !this.staging.includes(f) && !this.isCommittedInCurrentBranch(f) && !this.isIgnored(f));
-            
-            if (trackedFiles.length === 0 && untrackedFiles.length === 0) {
-                return output + "nothing to commit, working tree clean";
-            }
+        return { error: false, text: lines.join('\n') };
+    }
 
-            if (trackedFiles.length > 0) {
-                output += "Changes to be committed:\n\n";
-                trackedFiles.forEach(f => output += `\tnew file:   ${f}\n`);
-                output += "\n";
-            }
+    add(args) {
+        if (!this.isGitInited) return 'fatal: not a git repository';
+        const allFiles = Object.keys(this.fs).filter(f => f !== '.git' && !this._isIgnored(f));
+        let filesToAdd = [];
 
-            if (untrackedFiles.length > 0) {
-                output += "Untracked files:\n\n";
-                untrackedFiles.forEach(f => output += `\t${f}\n`);
-                output += "\n";
-            }
-            return output;
+        if (args === '.' || args === '-A' || args === '--all') {
+            filesToAdd = allFiles;
+        } else if (args === '-u') {
+            filesToAdd = allFiles.filter(f => this._isCommitted(f));
+        } else if (args === '--patch') {
+            return 'PATCH_MODE';
+        } else {
+            const target = args.replace(/['"]/g, '');
+            if (!this.fs[target]) return `fatal: pathspec '${target}' did not match any files`;
+            if (!this._isIgnored(target)) filesToAdd.push(target);
         }
 
-        add(args) {
-            if (!this.isGitInited) return "fatal: not a git repository";
-            const filesToAdd = [];
-            const allFiles = Object.keys(this.fs).filter(f => f !== '.git' && !this.isIgnored(f));
+        filesToAdd.forEach(f => {
+            if (!this.staging.includes(f)) this.staging.push(f);
+            this.modifiedFiles.delete(f);
+        });
+        return '';
+    }
 
-            if (args === "." || args === "-A") {
-                filesToAdd.push(...allFiles);
-            } else if (args === "-u") {
-                filesToAdd.push(...allFiles.filter(f => this.isCommittedInCurrentBranch(f)));
-            } else {
-                if (!this.fs[args]) return `fatal: pathspec '${args}' did not match any files`;
-                if (!this.isIgnored(args)) filesToAdd.push(args);
-            }
+    commit(message, opts = {}) {
+        if (!this.isGitInited) return 'fatal: not a git repository';
 
-            filesToAdd.forEach(f => {
-                if (!this.staging.includes(f)) this.staging.push(f);
-            });
-            return "";
-        }
+        let filesToCommit = [...this.staging];
+        let parent = this.head;
 
-        commit(message, amend = false, sign = false) {
-            if (!this.isGitInited) return "fatal: not a git repository";
-            
-            let filesToCommit = [...this.staging];
-            let parent = this.head;
-
-            if (amend) {
-                if (!this.head) return "fatal: You have nothing to amend.";
-                const oldCommit = this.commits.find(c => c.id === this.head);
-                filesToCommit = [...new Set([...oldCommit.files, ...this.staging])];
-                parent = oldCommit.parent;
-                // Remove old commit logically
+        if (opts.amend) {
+            if (!this.head) return 'fatal: You have nothing to amend.';
+            const old = this.commits.find(c => c.id === this.head);
+            if (old) {
+                filesToCommit = [...new Set([...old.files, ...this.staging])];
+                parent = old.parent;
                 this.commits = this.commits.filter(c => c.id !== this.head);
-            } else if (this.staging.length === 0) {
-                return "nothing to commit, working tree clean";
             }
-            
-            const id = Math.random().toString(16).substring(2, 9);
-            const commitObj = {
-                id,
-                message,
-                files: filesToCommit,
-                parent: parent,
-                branch: this.currentBranch,
-                author: `${this.config['user.name']} <${this.config['user.email']}>`,
-                timestamp: new Date().toLocaleString(),
-                signed: sign && this.gpgConfigured
-            };
-            
-            this.commits.push(commitObj);
-            this.head = id;
-            if (this.currentBranch !== 'detached HEAD') this.branches[this.currentBranch] = id;
-            this.staging = [];
-            
-            let sigInfo = commitObj.signed ? `\n[GPG Signed Commit]` : '';
-            return `[${this.currentBranch} ${id}] ${message}${sigInfo}\n ${commitObj.files.length} file changed.`;
+        } else if (opts.all) {
+            const allTracked = Object.keys(this.fs).filter(f => f !== '.git' && this._isCommitted(f));
+            allTracked.forEach(f => { if (!this.staging.includes(f)) this.staging.push(f); });
+            filesToCommit = [...this.staging];
         }
 
-        log(args) {
-            if (!this.isGitInited) return "fatal: not a git repository";
-            if (!this.head) return `fatal: your current branch '${this.currentBranch}' does not have any commits yet`;
-            
-            let output = "";
-            let current = this.head;
-            while(current) {
-                const c = this.commits.find(x => x.id === current);
-                if(!c) break;
-                
-                let tagStr = Object.keys(this.tags).find(t => this.tags[t] === c.id);
-                let dec = tagStr ? ` \x1b[32m(tag: ${tagStr})\x1b[0m` : '';
+        if (filesToCommit.length === 0 && !opts.allowEmpty) {
+            return 'nothing to commit, working tree clean';
+        }
 
-                if (args.includes('--oneline')) {
-                    output += `\x1b[33m${c.id}\x1b[0m${dec} ${c.message}\n`;
-                } else {
-                    let sigStr = c.signed ? `\x1b[32mgpg: Signature made using RSA key\x1b[0m\n` : '';
-                    output += `\x1b[33mcommit ${c.id}\x1b[0m${dec}\nAuthor: ${c.author}\nDate:   ${c.timestamp}\n${sigStr}\n    ${c.message}\n\n`;
-                    if (args.includes('--name-only')) {
-                        c.files.forEach(f => output += `${f}\n`);
-                        output += '\n';
-                    }
+        const id = this._genId();
+        const commitObj = {
+            id, message,
+            files: filesToCommit,
+            parent,
+            branch: this.currentBranch,
+            author: `${this.config['user.name'] || 'User'} <${this.config['user.email'] || 'user@example.com'}>`,
+            timestamp: new Date().toISOString().replace('T', ' ').substring(0, 19),
+            signed: opts.sign || this.gpgConfigured
+        };
+
+        this.commits.push(commitObj);
+        this.head = id;
+        if (this.currentBranch !== 'detached HEAD') {
+            this.branches[this.currentBranch] = id;
+        }
+        this.staging = [];
+        this.modifiedFiles.clear();
+
+        const root = parent === null ? '(root-commit) ' : '';
+        const sig = commitObj.signed ? '\n gpg: Signature made with RSA key\n gpg: Good signature' : '';
+        return `[${this.currentBranch} ${root}${id}] ${message}${sig}\n ${commitObj.files.length} file(s) changed`;
+    }
+
+    log(args = '') {
+        if (!this.isGitInited) return 'fatal: not a git repository';
+        if (!this.head) return `fatal: your current branch '${this.currentBranch}' does not have any commits yet`;
+
+        let lines = [];
+        let current = this.head;
+        let count = 0;
+        const maxCount = args.includes('-') ? parseInt((args.match(/-(\d+)/) || [0, 999])[1]) : 999;
+
+        while (current && count < maxCount) {
+            const c = this.commits.find(x => x.id === current);
+            if (!c) break;
+
+            let tagStr = '';
+            const matchingTags = Object.keys(this.tags).filter(t => this.tags[t] === c.id);
+            if (matchingTags.length > 0) tagStr = `, tag: ${matchingTags.join(', tag: ')}`;
+
+            const isHead = c.id === this.head;
+            const decoration = isHead ? ` (HEAD -> ${this.currentBranch}${tagStr})` : (tagStr ? ` (${tagStr.substring(2)})` : '');
+
+            if (args.includes('--oneline') || args.includes('lg')) {
+                const prefix = args.includes('lg') || args.includes('--graph') ? '* ' : '';
+                lines.push(`${prefix}{{hash}}${c.id}{{/hash}}{{branch}}${decoration}{{/branch}} ${c.message}`);
+            } else if (args.includes('--stat')) {
+                lines.push(`{{hash}}commit ${c.id}{{/hash}}{{branch}}${decoration}{{/branch}}`);
+                lines.push(`Author: ${c.author}`);
+                lines.push(`Date:   ${c.timestamp}`);
+                lines.push(`\n    ${c.message}\n`);
+                c.files.forEach(f => lines.push(` ${f} | 1 +`));
+                lines.push(` ${c.files.length} file(s) changed\n`);
+            } else {
+                lines.push(`{{hash}}commit ${c.id}{{/hash}}{{branch}}${decoration}{{/branch}}`);
+                lines.push(`Author: ${c.author}`);
+                lines.push(`Date:   ${c.timestamp}`);
+                lines.push(`\n    ${c.message}\n`);
+                if (args.includes('--name-only')) {
+                    c.files.forEach(f => lines.push(f));
+                    lines.push('');
                 }
-                current = c.parent;
             }
-            return output;
+            current = c.parent;
+            count++;
         }
+        return lines.join('\n');
+    }
 
-        diff() {
-            if (this.staging.length === 0) return "";
-            let out = "";
-            this.staging.forEach(f => {
-                out += `\x1b[32mdiff --git a/${f} b/${f}\x1b[0m\n+ New changes in ${f}\n`;
-            });
-            return out;
-        }
-
-        show() {
-            if (!this.head) return "fatal: bad default revision 'HEAD'";
-            const c = this.commits.find(x => x.id === this.head);
-            return this.log(['']).split('\n\n')[0] + `\n\n\x1b[32mdiff --git...\x1b[0m\n+ contents of commit`;
-        }
-
-        clean(args) {
-            if (!args.includes('-f')) return "fatal: clean.requireForce defaults to true and neither -i, -n, nor -f given; refusing to clean";
-            let removed = 0;
-            Object.keys(this.fs).forEach(f => {
-                if (f !== '.git' && !this.staging.includes(f) && !this.isCommittedInCurrentBranch(f) && !this.isIgnored(f)) {
-                    delete this.fs[f];
-                    removed++;
-                }
-            });
-            return `Removing ${removed} untracked files`;
-        }
-
-        tag(name) {
-            if (!name) return Object.keys(this.tags).join('\n');
-            if (this.tags[name]) return `fatal: tag '${name}' already exists`;
-            this.tags[name] = this.head;
-            return "";
-        }
-
-        remote(action, name, url) {
-            if (action === 'add') {
-                this.remotes[name] = url;
-                return "";
-            } else if (action === '-v') {
-                return Object.entries(this.remotes).map(([k,v]) => `${k}\t${v} (fetch)\n${k}\t${v} (push)`).join('\n');
+    branch(args = '') {
+        if (!this.isGitInited) return 'fatal: not a git repository';
+        if (!args || args === '-a' || args === '--all') {
+            const local = Object.keys(this.branches).map(b =>
+                b === this.currentBranch ? `* {{branch}}${b}{{/branch}}` : `  ${b}`
+            );
+            if (args === '-a' || args === '--all') {
+                Object.keys(this.remotes).forEach(r => {
+                    local.push(`  remotes/${r}/main`);
+                });
             }
+            return local.join('\n');
         }
 
-        push() {
-            if (Object.keys(this.remotes).length === 0) return "fatal: No configured push destination.";
-            return `Enumerating objects: 5, done.\nWriting objects: 100% (5/5), 400 bytes | 400.00 KiB/s, done.\nTo ${Object.values(this.remotes)[0]}\n   refs/heads/${this.currentBranch} -> ${this.currentBranch}`;
+        const parts = args.split(/\s+/);
+        if (parts[0] === '-d' || parts[0] === '-D') {
+            const target = parts[1];
+            if (!this.branches[target]) return `error: branch '${target}' not found.`;
+            if (target === this.currentBranch) return `error: Cannot delete branch '${target}' checked out.`;
+            delete this.branches[target];
+            return `Deleted branch ${target} (was ${this._genId()}).`;
+        }
+        if (parts[0] === '-m' || parts[0] === '-M') {
+            const oldName = this.currentBranch;
+            const newName = parts[1];
+            this.branches[newName] = this.branches[oldName];
+            delete this.branches[oldName];
+            this.currentBranch = newName;
+            return '';
         }
 
-        branch(name) {
-            if (!this.isGitInited) return "fatal: not a git repository";
-            if (!name) return Object.keys(this.branches).map(b => (b === this.currentBranch ? `* \x1b[32m${b}\x1b[0m` : `  ${b}`)).join('\n');
-            if (this.branches[name]) return `fatal: A branch named '${name}' already exists.`;
+        const name = parts[0];
+        if (this.branches.hasOwnProperty(name)) return `fatal: A branch named '${name}' already exists.`;
+        this.branches[name] = this.head;
+        return '';
+    }
+
+    checkout(args) {
+        if (!this.isGitInited) return 'fatal: not a git repository';
+        const parts = args.split(/\s+/);
+
+        if (parts[0] === '-b') {
+            const name = parts[1];
+            if (this.branches.hasOwnProperty(name)) return `fatal: A branch named '${name}' already exists.`;
             this.branches[name] = this.head;
-            return "";
+            this.currentBranch = name;
+            return `Switched to a new branch '${name}'`;
+        }
+        if (parts[0] === '--' && parts[1]) {
+            const file = parts[1];
+            this.modifiedFiles.delete(file);
+            return '';
         }
 
-        checkout(name) {
-            if (this.branches[name]) {
-                this.currentBranch = name;
-                this.head = this.branches[name];
-                return `Switched to branch '${name}'`;
-            }
-            return `error: pathspec '${name}' did not match any file(s) known to git`;
+        const name = parts[0];
+        if (this.branches.hasOwnProperty(name)) {
+            this.currentBranch = name;
+            this.head = this.branches[name];
+            return `Switched to branch '${name}'`;
         }
-
-        isCommittedInCurrentBranch(filename) {
-            let current = this.head;
-            while(current) {
-                const c = this.commits.find(x => x.id === current);
-                if (c && c.files.includes(filename)) return true;
-                current = c ? c.parent : null;
-            }
-            return false;
+        // Check if it's a tag or commit hash
+        if (this.tags[name]) {
+            this.currentBranch = 'detached HEAD';
+            this.head = this.tags[name];
+            return `Note: switching to '${name}'.\nYou are in 'detached HEAD' state.`;
         }
-
-        createFile(filename, content = "") {
-            this.fs[filename] = { type: 'file', content: content };
-            return "";
-        }
+        return `error: pathspec '${name}' did not match any file(s) known to git.`;
     }
 
-    /**
-     * MODULE DEFINITIONS & CURRICULUM
-     */
-    const modules = {
-        'workflow-1': {
-            title: "1. Core Workflow (Scratch)",
-            setup: (git) => { git.reset(); },
-            steps: [
-                { task: "Initialize a new repository", expected: "git init", cmd: "git init" },
-                { task: "Create an index file", expected: 'echo "hello" > index.html', cmd: 'echo "hello" > index.html' },
-                { task: "Check repository status", expected: "git status", cmd: "git status" },
-                { task: "Stage the new file", expected: "git add index.html", cmd: "git add index.html" },
-                { task: "Commit the file", expected: /git commit -m ".+"/, cmd: 'git commit -m "Initial commit"' }
-            ]
-        },
-        'workflow-2': {
-            title: "2. Working on Existing Projects",
-            setup: (git) => { git.reset(); },
-            steps: [
-                { task: "Clone a remote repository", expected: /git clone .+/, cmd: 'git clone https://github.com/org/repo.git' },
-                { task: "Create a new branch 'feature'", expected: "git branch feature", cmd: "git branch feature" },
-                { task: "Switch to the branch", expected: "git checkout feature", cmd: "git checkout feature" },
-                { task: "Make changes", expected: 'echo "update" > data.txt', cmd: 'echo "update" > data.txt' },
-                { task: "Add and commit", expected: /git commit -m ".+"/, cmd: 'git add .\ngit commit -m "data update"' },
-                { task: "Push changes to remote", expected: "git push", cmd: "git push" }
-            ]
-        },
-        'history': {
-            title: "3. Advanced History & Logs",
-            setup: (git) => {
-                git.reset(); git.init();
-                git.createFile('app.js'); git.add('app.js'); git.commit('Init app');
-                git.createFile('style.css'); git.add('style.css'); git.commit('Add styles');
-                git.createFile('index.html'); git.add('index.html'); git.commit('Add html');
-            },
-            steps: [
-                { task: "View one-line history", expected: "git log --oneline", cmd: "git log --oneline", desc: "Use `--oneline` for a compact view." },
-                { task: "View history with modified files", expected: "git log --name-only", cmd: "git log --name-only", desc: "Use `--name-only` to see which files changed in each commit." },
-                { task: "View who changed a file", expected: "git blame app.js", cmd: "git blame app.js", desc: "Use `git blame <file>` to see author info per line." }
-            ]
-        },
-        'modify': {
-            title: "4. Modifying Commits",
-            setup: (git) => {
-                git.reset(); git.init();
-                git.createFile('config.json'); git.add('config.json'); git.commit('Add config');
-            },
-            steps: [
-                { task: "Oh no, you forgot a file! Create it.", expected: 'echo "key" > secret.json', cmd: 'echo "key" > secret.json' },
-                { task: "Stage the forgotten file.", expected: 'git add secret.json', cmd: 'git add secret.json' },
-                { task: "Amend the previous commit", expected: /git commit --amend/, cmd: 'git commit --amend -m "Add config and secret"', desc: "Use `git commit --amend -m 'new msg'` to add staged changes to the last commit." }
-            ]
-        },
-        'ignore': {
-            title: "5. Ignoring Files (.gitignore)",
-            setup: (git) => { git.reset(); git.init(); },
-            steps: [
-                { task: "Create a junk file", expected: 'echo "junk" > debug.log', cmd: 'echo "junk" > debug.log' },
-                { task: "Check status (it's untracked)", expected: "git status", cmd: "git status" },
-                { task: "Create a .gitignore file ignoring *.log", expected: 'echo "*.log" > .gitignore', cmd: 'echo "*.log" > .gitignore' },
-                { task: "Check status again (log is hidden!)", expected: "git status", cmd: "git status", desc: "Notice `debug.log` is no longer listed. Only `.gitignore` is." },
-                { task: "Add all safe files", expected: "git add .", cmd: "git add ." }
-            ]
-        },
-        'security': {
-            title: "6. Security & GPG Signatures",
-            setup: (git) => { git.reset(); git.init(); git.createFile('main.c'); git.add('main.c'); },
-            steps: [
-                { task: "Generate a GPG key", expected: "gpg --gen-key", cmd: "gpg --gen-key", desc: "Generates a cryptographic keypair." },
-                { task: "Configure Git to use GPG", expected: "git config --global commit.gpgsign true", cmd: "git config --global commit.gpgsign true" },
-                { task: "Create a signed commit", expected: /git commit -S -m ".+"/, cmd: 'git commit -S -m "Secure commit"', desc: "Use the `-S` flag to sign your commit cryptographically." },
-                { task: "Verify signature in log", expected: "git log --show-signature", cmd: "git log --show-signature" }
-            ]
-        },
-        'tags': {
-            title: "7. Tagging & Releases",
-            setup: (git) => { git.reset(); git.init(); git.createFile('v1.txt'); git.add('v1.txt'); git.commit('Release 1'); },
-            steps: [
-                { task: "List current tags", expected: "git tag", cmd: "git tag" },
-                { task: "Create an annotated tag v1.0", expected: "git tag v1.0", cmd: "git tag v1.0", desc: "Tags mark specific release points." },
-                { task: "Push tags to remote", expected: "git push --tags", cmd: "git push --tags" }
-            ]
-        },
-        'diff': {
-            title: "8. Viewing Changes",
-            setup: (git) => { git.reset(); git.init(); git.createFile('code.py'); git.add('code.py'); git.commit('v1'); git.createFile('code.py', 'updated'); git.add('code.py'); },
-            steps: [
-                { task: "View staged changes", expected: "git diff", cmd: "git diff", desc: "Shows line-by-line differences." },
-                { task: "View details of last commit", expected: "git show", cmd: "git show", desc: "Shows the patch and metadata of HEAD." }
-            ]
+    switchBranch(args) {
+        const parts = args.split(/\s+/);
+        if (parts[0] === '-c') {
+            return this.checkout(`-b ${parts[1]}`);
         }
+        return this.checkout(args);
+    }
+
+    merge(args) {
+        if (!this.isGitInited) return 'fatal: not a git repository';
+        const parts = args.split(/\s+/);
+        const branchName = parts.filter(p => !p.startsWith('-') && !p.startsWith('"')).pop();
+
+        if (args.includes('hotfix') || args.includes('conflict')) {
+            return `Auto-merging README.md\nCONFLICT (content): Merge conflict in README.md\nAutomatic merge failed; fix conflicts and then commit the result.`;
+        }
+
+        const noFF = args.includes('--no-ff');
+        if (noFF) {
+            return `Merge made by the 'recursive' strategy.\n 1 file changed, 2 insertions(+)`;
+        }
+
+        return `Updating ${this._genId()}..${this._genId()}\nFast-forward\n 1 file changed, 2 insertions(+)`;
+    }
+
+    tag(args = '') {
+        if (!args) {
+            const tagList = Object.keys(this.tags);
+            return tagList.length > 0 ? tagList.join('\n') : '';
+        }
+        const parts = args.split(/\s+/);
+        if (parts[0] === '-d') {
+            const tagName = parts[1];
+            if (!this.tags[tagName]) return `error: tag '${tagName}' not found.`;
+            delete this.tags[tagName];
+            return `Deleted tag '${tagName}'`;
+        }
+        if (parts[0] === '-a') {
+            const tagName = parts[1];
+            this.tags[tagName] = this.head;
+            return '';
+        }
+        const tagName = parts[0];
+        this.tags[tagName] = this.head;
+        return '';
+    }
+
+    stash(args = '') {
+        if (!args || args === 'push') {
+            this.stashes.unshift({ files: [...this.staging], message: 'WIP on ' + this.currentBranch });
+            this.staging = [];
+            return `Saved working directory and index state WIP on ${this.currentBranch}`;
+        }
+        if (args.startsWith('save')) {
+            const msgMatch = args.match(/"([^"]+)"/);
+            const msg = msgMatch ? msgMatch[1] : 'WIP';
+            this.stashes.unshift({ files: [...this.staging], message: msg });
+            this.staging = [];
+            return `Saved working directory and index state On ${this.currentBranch}: ${msg}`;
+        }
+        if (args === 'list') {
+            return this.stashes.map((s, i) => `stash@{${i}}: ${s.message}`).join('\n') || '';
+        }
+        if (args === 'pop') {
+            if (this.stashes.length === 0) return 'No stash entries found.';
+            const s = this.stashes.shift();
+            this.staging = [...s.files];
+            return `On branch ${this.currentBranch}\nChanges reinstated.\nDropped stash@{0}`;
+        }
+        if (args === 'apply') {
+            if (this.stashes.length === 0) return 'No stash entries found.';
+            this.staging = [...this.stashes[0].files];
+            return `On branch ${this.currentBranch}\nChanges reinstated.`;
+        }
+        if (args === 'drop') {
+            if (this.stashes.length === 0) return 'No stash entries found.';
+            this.stashes.shift();
+            return 'Dropped stash@{0}';
+        }
+        return '';
+    }
+
+    remote(args = '') {
+        if (!args) return Object.keys(this.remotes).join('\n');
+        if (args === '-v') {
+            return Object.entries(this.remotes).map(([n, u]) =>
+                `${n}\t${u} (fetch)\n${n}\t${u} (push)`
+            ).join('\n');
+        }
+        const parts = args.split(/\s+/);
+        if (parts[0] === 'add') {
+            this.remotes[parts[1]] = parts[2];
+            return '';
+        }
+        if (parts[0] === 'remove' || parts[0] === 'rm') {
+            delete this.remotes[parts[1]];
+            return '';
+        }
+        return '';
+    }
+
+    restore(args) {
+        if (!this.isGitInited) return 'fatal: not a git repository';
+        if (args.includes('--staged')) {
+            const file = args.replace('--staged', '').trim();
+            this.staging = this.staging.filter(f => f !== file);
+            return '';
+        }
+        const file = args.trim();
+        this.modifiedFiles.delete(file);
+        return '';
+    }
+
+    createFile(name, content = '') {
+        this.fs[name] = { type: 'file', content };
+        if (this._isCommitted(name)) this.modifiedFiles.add(name);
+        return '';
+    }
+
+    removeFile(name) {
+        delete this.fs[name];
+        this.staging = this.staging.filter(f => f !== name);
+        return '';
+    }
+
+    getPromptInfo() {
+        return {
+            path: this.dir,
+            branch: this.isGitInited ? this.currentBranch : null
+        };
+    }
+}
+
+// ============================================================
+//  MODULE DEFINITIONS — 24 Comprehensive Modules
+// ============================================================
+const MODULES = {
+// ---- BEGINNER ----
+'m01': {
+    title: '01. What is Git? — Getting Started',
+    level: 'beginner',
+    concepts: [
+        'Git is a <b>distributed version control system</b> (DVCS) created by Linus Torvalds in 2005.',
+        'It tracks changes in your files, lets you revert to previous states, and enables collaboration.',
+        'Key idea: <b>Every developer has a full copy</b> of the entire repository history on their machine.',
+    ],
+    setup: g => { g.reset(); },
+    steps: [
+        {
+            task: 'Check your Git version',
+            cmd: 'git --version',
+            expected: 'git --version',
+            hint: 'Type exactly: git --version',
+            explain: 'This confirms Git is installed and shows the version number. Always verify your tools first!'
+        },
+        {
+            task: 'View the built-in help for Git',
+            cmd: 'git help',
+            expected: 'git help',
+            hint: 'Type: git help',
+            explain: 'Git has extensive built-in documentation. You can also use "git help <command>" for specific topics.'
+        },
+    ]
+},
+
+'m02': {
+    title: '02. Configuration — Setting Up Your Identity',
+    level: 'beginner',
+    concepts: [
+        'Before making commits, Git needs to know <b>who you are</b>.',
+        'The <code>--global</code> flag sets config for all repositories on your machine.',
+        'Config levels: <b>system</b> (all users) → <b>global</b> (your user) → <b>local</b> (this repo only).',
+    ],
+    setup: g => { g.reset(); },
+    steps: [
+        {
+            task: 'Set your name',
+            cmd: 'git config --global user.name "Your Name"',
+            expected: /git config --global user\.name ".+"/,
+            hint: 'git config --global user.name "Muhammad Ali"',
+            explain: 'This name appears in every commit you make. Use your real name for professional projects.'
+        },
+        {
+            task: 'Set your email',
+            cmd: 'git config --global user.email "you@example.com"',
+            expected: /git config --global user\.email ".+"/,
+            hint: 'git config --global user.email "ali@example.com"',
+            explain: 'Use the same email as your GitHub/GitLab account so your commits are linked to your profile.'
+        },
+        {
+            task: 'Set your preferred text editor',
+            cmd: 'git config --global core.editor "code --wait"',
+            expected: /git config --global core\.editor/,
+            hint: 'git config --global core.editor "code --wait"',
+            explain: '"code --wait" uses VS Code. Alternatives: "nano", "vim", "notepad". The --wait flag tells Git to wait until you close the editor.'
+        },
+        {
+            task: 'Set default branch name to "main"',
+            cmd: 'git config --global init.defaultBranch main',
+            expected: 'git config --global init.defaultBranch main',
+            hint: 'git config --global init.defaultBranch main',
+            explain: 'Modern convention uses "main" instead of the older "master". This affects new repositories you create.'
+        },
+        {
+            task: 'View all your configuration',
+            cmd: 'git config --list',
+            expected: 'git config --list',
+            hint: 'git config --list',
+            explain: 'This shows all active settings across system, global, and local levels.'
+        },
+        {
+            task: 'Create a shortcut: "st" for "status"',
+            cmd: 'git config --global alias.st status',
+            expected: 'git config --global alias.st status',
+            hint: 'git config --global alias.st status',
+            explain: 'Aliases save keystrokes. Now "git st" works the same as "git status".'
+        },
+    ]
+},
+
+'m03': {
+    title: '03. Creating Your First Repository',
+    level: 'beginner',
+    concepts: [
+        'A <b>repository</b> (repo) is a folder where Git tracks all changes.',
+        '<code>git init</code> creates a hidden <code>.git</code> folder that stores all version history.',
+        'The <b>three areas</b>: Working Directory → Staging Area → Repository (commits).',
+    ],
+    setup: g => { g.reset(); },
+    steps: [
+        {
+            task: 'Create a project folder and enter it',
+            cmd: 'mkdir my-project && cd my-project',
+            expected: /mkdir .+ && cd .+/,
+            hint: 'mkdir my-project && cd my-project',
+            explain: '"mkdir" creates a directory, "&&" chains commands, "cd" changes into it.'
+        },
+        {
+            task: 'Initialize a Git repository',
+            cmd: 'git init',
+            expected: 'git init',
+            hint: 'git init',
+            explain: 'This creates the .git directory. Your folder is now a Git repository! All history will be stored here.'
+        },
+        {
+            task: 'Check the repository status',
+            cmd: 'git status',
+            expected: 'git status',
+            hint: 'git status',
+            explain: '"git status" is your best friend. It shows which branch you\'re on, what\'s staged, and what\'s untracked.'
+        },
+    ]
+},
+
+'m04': {
+    title: '04. Tracking Files — Add & Stage',
+    level: 'beginner',
+    concepts: [
+        'Git does NOT automatically track files. You must explicitly <b>add</b> them.',
+        'The <b>Staging Area</b> (index) is a preparation zone between your working directory and the repository.',
+        'Think of it as a "loading dock" — you choose exactly what goes into the next shipment (commit).',
+    ],
+    setup: g => { g.reset(); g.init(); },
+    steps: [
+        {
+            task: 'Create a README file',
+            cmd: 'echo "# My Project" > README.md',
+            expected: /echo .+ > README\.md/,
+            hint: 'echo "# My Project" > README.md',
+            explain: 'The > operator creates a file with the given content. This is a common way to create files from the command line.'
+        },
+        {
+            task: 'Create a configuration file',
+            cmd: 'echo "version=1.0" > config.txt',
+            expected: /echo .+ > config\.txt/,
+            hint: 'echo "version=1.0" > config.txt',
+            explain: 'We now have two untracked files. Git sees them but isn\'t tracking changes yet.'
+        },
+        {
+            task: 'Check status to see untracked files',
+            cmd: 'git status',
+            expected: 'git status',
+            hint: 'git status',
+            explain: 'Notice both files appear under "Untracked files" in red. Git knows they exist but isn\'t watching them.'
+        },
+        {
+            task: 'Stage only the README file',
+            cmd: 'git add README.md',
+            expected: 'git add README.md',
+            hint: 'git add README.md',
+            explain: '"git add" moves a file to the staging area. Only staged files will be included in the next commit.'
+        },
+        {
+            task: 'Check status to see the staged file',
+            cmd: 'git status',
+            expected: 'git status',
+            hint: 'git status',
+            explain: 'README.md now shows under "Changes to be committed" (green). config.txt is still untracked.'
+        },
+        {
+            task: 'Stage all remaining files at once',
+            cmd: 'git add .',
+            expected: /git add (\.|--all|-A)/,
+            hint: 'git add .  (the dot means "everything in current directory")',
+            explain: '"git add ." stages ALL untracked and modified files. Use "git add -A" for the same effect. Be careful — make sure you want everything staged!'
+        },
+    ]
+},
+
+'m05': {
+    title: '05. Making Commits — Saving Snapshots',
+    level: 'beginner',
+    concepts: [
+        'A <b>commit</b> is a permanent snapshot of your staged files at a point in time.',
+        'Each commit has: a unique <b>hash</b> (ID), an <b>author</b>, a <b>timestamp</b>, and a <b>message</b>.',
+        'Good commit messages use the imperative mood: "Add feature" not "Added feature".',
+    ],
+    setup: g => { g.reset(); g.init(); g.createFile('index.html', '<html></html>'); g.add('.'); },
+    steps: [
+        {
+            task: 'Make your first commit',
+            cmd: 'git commit -m "Initial commit"',
+            expected: /git commit -m ".+"/,
+            hint: 'git commit -m "Initial commit"',
+            explain: 'The -m flag provides the commit message inline. Without it, Git opens your configured editor.'
+        },
+        {
+            task: 'Create another file and stage it',
+            cmd: 'echo "body {}" > style.css',
+            expected: /echo .+ > style\.css/,
+            hint: 'echo "body {}" > style.css',
+            explain: 'Let\'s practice the full workflow: create → add → commit.'
+        },
+        {
+            task: 'Stage the new file',
+            cmd: 'git add style.css',
+            expected: /git add (style\.css|\.)/,
+            hint: 'git add style.css',
+            explain: 'You can stage individual files for more precise commits.'
+        },
+        {
+            task: 'Commit with a descriptive message',
+            cmd: 'git commit -m "Add base stylesheet"',
+            expected: /git commit -m ".+"/,
+            hint: 'git commit -m "Add base stylesheet"',
+            explain: 'Good messages explain WHAT changed and WHY. They help future-you (and teammates) understand the history.'
+        },
+        {
+            task: 'Check that the working tree is clean',
+            cmd: 'git status',
+            expected: 'git status',
+            hint: 'git status',
+            explain: 'After committing everything, you should see "nothing to commit, working tree clean". A clean state!'
+        },
+    ]
+},
+
+'m06': {
+    title: '06. Viewing History — Git Log',
+    level: 'beginner',
+    concepts: [
+        '<code>git log</code> shows the commit history of the current branch.',
+        'Each commit is identified by a <b>SHA-1 hash</b> — a unique 40-character string (usually shown as 7 chars).',
+        'You can customize the output with flags like <code>--oneline</code>, <code>--graph</code>, and <code>--stat</code>.',
+    ],
+    setup: g => {
+        g.reset(); g.init();
+        g.createFile('app.js', 'v1'); g.add('.'); g.commit('Initialize application');
+        g.createFile('utils.js', 'helpers'); g.add('.'); g.commit('Add utility functions');
+        g.createFile('README.md', '# App'); g.add('.'); g.commit('Add project documentation');
+    },
+    steps: [
+        {
+            task: 'View the full commit history',
+            cmd: 'git log',
+            expected: 'git log',
+            hint: 'git log',
+            explain: 'Shows detailed info for each commit: hash, author, date, and message. Press "q" to exit in a real terminal.'
+        },
+        {
+            task: 'View compact one-line history',
+            cmd: 'git log --oneline',
+            expected: 'git log --oneline',
+            hint: 'git log --oneline',
+            explain: 'Much more readable! Shows just the short hash and message. Great for quick overviews.'
+        },
+        {
+            task: 'View history with file change statistics',
+            cmd: 'git log --stat',
+            expected: 'git log --stat',
+            hint: 'git log --stat',
+            explain: '--stat shows which files changed and how many insertions/deletions per commit.'
+        },
+        {
+            task: 'View history with branch graph',
+            cmd: 'git log --oneline --graph --all',
+            expected: /git log --oneline --graph/,
+            hint: 'git log --oneline --graph --all',
+            explain: '--graph draws an ASCII art branch structure. --all shows all branches, not just the current one.'
+        },
+    ]
+},
+
+'m07': {
+    title: '07. Ignoring Files — .gitignore',
+    level: 'beginner',
+    concepts: [
+        'Some files should NEVER be committed: API keys, build artifacts, OS files, dependencies.',
+        'The <code>.gitignore</code> file tells Git which files/folders to completely ignore.',
+        'Common patterns: <code>*.log</code>, <code>node_modules/</code>, <code>.env</code>, <code>*.pyc</code>, <code>.DS_Store</code>.',
+    ],
+    setup: g => { g.reset(); g.init(); },
+    steps: [
+        {
+            task: 'Create some files that should NOT be tracked',
+            cmd: 'echo "SECRET_KEY=abc123" > .env',
+            expected: /echo .+ > \.env/,
+            hint: 'echo "SECRET_KEY=abc123" > .env',
+            explain: '.env files contain sensitive configuration. They must NEVER be committed to version control!'
+        },
+        {
+            task: 'Create a log file',
+            cmd: 'echo "error log" > debug.log',
+            expected: /echo .+ > debug\.log/,
+            hint: 'echo "error log" > debug.log',
+            explain: 'Log files are generated output and don\'t belong in version control.'
+        },
+        {
+            task: 'Check status — both files are visible',
+            cmd: 'git status',
+            expected: 'git status',
+            hint: 'git status',
+            explain: 'Notice both .env and debug.log appear as untracked. We need to tell Git to ignore them.'
+        },
+        {
+            task: 'Create a .gitignore file',
+            cmd: 'echo "*.log" > .gitignore',
+            expected: /echo .+ > \.gitignore/,
+            hint: 'echo "*.log" > .gitignore',
+            explain: '*.log tells Git to ignore ALL files ending in .log. Patterns use glob syntax.'
+        },
+        {
+            task: 'Check status — log file is now hidden!',
+            cmd: 'git status',
+            expected: 'git status',
+            hint: 'git status',
+            explain: 'debug.log has disappeared from the untracked list! But .env is still visible — we should add it to .gitignore too.'
+        },
+        {
+            task: 'Stage and commit the .gitignore file',
+            cmd: 'git add .gitignore',
+            expected: /git add \.gitignore/,
+            hint: 'git add .gitignore',
+            explain: 'The .gitignore file itself SHOULD be committed so all team members share the same ignore rules.'
+        },
+    ]
+},
+
+'m08': {
+    title: '08. Undoing Changes — Restore & Checkout',
+    level: 'beginner',
+    concepts: [
+        'Made a mistake? Git gives you multiple ways to undo changes depending on the situation.',
+        '<code>git restore &lt;file&gt;</code> — discard changes in working directory (modern way).',
+        '<code>git restore --staged &lt;file&gt;</code> — unstage a file without losing changes.',
+    ],
+    setup: g => {
+        g.reset(); g.init();
+        g.createFile('app.js', 'console.log("hello")'); g.add('.'); g.commit('Initial version');
+    },
+    steps: [
+        {
+            task: 'Modify the file (simulate a bad edit)',
+            cmd: 'echo "BROKEN CODE" > app.js',
+            expected: /echo .+ > app\.js/,
+            hint: 'echo "BROKEN CODE" > app.js',
+            explain: 'Oh no, we\'ve overwritten our working code with something broken!'
+        },
+        {
+            task: 'View what changed',
+            cmd: 'git diff',
+            expected: 'git diff',
+            hint: 'git diff',
+            explain: 'git diff shows line-by-line differences between your working directory and the staging area.'
+        },
+        {
+            task: 'Discard the change — restore the original',
+            cmd: 'git restore app.js',
+            expected: /git restore app\.js/,
+            hint: 'git restore app.js',
+            explain: 'This reverts app.js back to its last committed state. The bad edit is gone! (This is irreversible.)'
+        },
+        {
+            task: 'Make another change and stage it',
+            cmd: 'echo "staged change" > app.js',
+            expected: /echo .+ > app\.js/,
+            hint: 'echo "staged change" > app.js',
+            explain: 'Let\'s practice unstaging.'
+        },
+        {
+            task: 'Stage the change',
+            cmd: 'git add app.js',
+            expected: /git add app\.js/,
+            hint: 'git add app.js',
+            explain: 'The file is now staged and ready to commit. But what if we staged it by accident?'
+        },
+        {
+            task: 'Unstage the file (keep the changes)',
+            cmd: 'git restore --staged app.js',
+            expected: /git restore --staged app\.js/,
+            hint: 'git restore --staged app.js',
+            explain: 'This removes app.js from the staging area but keeps your changes in the working directory. Safe undo!'
+        },
+    ]
+},
+
+// ---- INTERMEDIATE ----
+'m09': {
+    title: '09. Branching — Parallel Development',
+    level: 'intermediate',
+    concepts: [
+        '<b>Branches</b> let you diverge from the main line of development and work independently.',
+        'Creating a branch is <b>instant and lightweight</b> — it\'s just a pointer to a commit.',
+        'The default branch is usually called <b>main</b>. Feature work happens on separate branches.',
+    ],
+    setup: g => {
+        g.reset(); g.init();
+        g.createFile('index.html', '<html>'); g.add('.'); g.commit('Initial commit');
+    },
+    steps: [
+        {
+            task: 'List all branches',
+            cmd: 'git branch',
+            expected: /git branch$/,
+            hint: 'git branch',
+            explain: 'The asterisk (*) marks the currently active branch. Right now you only have "main".'
+        },
+        {
+            task: 'Create a new branch called "feature/login"',
+            cmd: 'git branch feature/login',
+            expected: /git branch feature\/login/,
+            hint: 'git branch feature/login',
+            explain: 'This creates the branch but does NOT switch to it. You\'re still on "main".'
+        },
+        {
+            task: 'Switch to the new branch',
+            cmd: 'git checkout feature/login',
+            expected: /git (checkout|switch) feature\/login/,
+            hint: 'git checkout feature/login',
+            explain: 'Now HEAD points to feature/login. Any commits you make will be on this branch only.'
+        },
+        {
+            task: 'Create a file on this branch',
+            cmd: 'echo "login form" > login.html',
+            expected: /echo .+ > login\.html/,
+            hint: 'echo "login form" > login.html',
+            explain: 'This file exists only on the feature branch. The main branch doesn\'t have it.'
+        },
+        {
+            task: 'Stage and commit on the feature branch',
+            cmd: 'git add . && git commit -m "Add login page"',
+            expected: /git commit -m ".+"/,
+            hint: 'git add .\ngit commit -m "Add login page"',
+            explain: 'This commit is now part of feature/login\'s history, but NOT main\'s history.'
+        },
+        {
+            task: 'Switch back to main',
+            cmd: 'git checkout main',
+            expected: /git (checkout|switch) main/,
+            hint: 'git checkout main',
+            explain: 'Notice that login.html disappears from your working directory — it only exists on the feature branch!'
+        },
+        {
+            task: 'Create a branch AND switch to it in one command',
+            cmd: 'git checkout -b feature/signup',
+            expected: /git checkout -b feature\/signup/,
+            hint: 'git checkout -b feature/signup',
+            explain: 'The "-b" flag creates and switches in one step. This is the most common way to create branches.'
+        },
+    ]
+},
+
+'m10': {
+    title: '10. Merging & Conflict Resolution',
+    level: 'intermediate',
+    concepts: [
+        '<b>Merging</b> combines the work from different branches into one.',
+        '<b>Fast-forward merge</b>: if the target branch hasn\'t diverged, Git just moves the pointer forward.',
+        '<b>Merge conflict</b>: when both branches changed the same lines, Git can\'t decide — YOU must resolve it.',
+    ],
+    setup: g => {
+        g.reset(); g.init();
+        g.createFile('README.md', '# Project'); g.add('.'); g.commit('Init');
+        g.checkout('-b feature/header');
+        g.createFile('header.html', '<header>Nav</header>'); g.add('.'); g.commit('Add header');
+        g.checkout('main');
+    },
+    steps: [
+        {
+            task: 'Make sure you\'re on main',
+            cmd: 'git checkout main',
+            expected: /git (checkout|switch) main/,
+            hint: 'git checkout main',
+            explain: 'Always merge INTO the branch you want to update. Stand on main, merge feature into it.'
+        },
+        {
+            task: 'Merge the header feature into main',
+            cmd: 'git merge feature/header',
+            expected: /git merge feature\/header/,
+            hint: 'git merge feature/header',
+            explain: 'Since main hadn\'t changed, this is a "fast-forward" merge — Git simply moves the main pointer forward.'
+        },
+        {
+            task: 'Now simulate a merge conflict',
+            cmd: 'git merge hotfix/readme-update',
+            expected: /git merge hotfix/,
+            hint: 'git merge hotfix/readme-update',
+            explain: 'When both branches modify the same lines, Git creates a CONFLICT that you must resolve manually.'
+        },
+        {
+            task: 'Resolve the conflict: stage the fixed file',
+            cmd: 'git add README.md',
+            expected: 'git add README.md',
+            hint: 'git add README.md',
+            explain: 'After editing the conflicted file to remove the conflict markers (<<<, ===, >>>), stage it.'
+        },
+        {
+            task: 'Complete the merge with a commit',
+            cmd: 'git commit -m "Resolve merge conflict in README"',
+            expected: /git commit -m ".+"/,
+            hint: 'git commit -m "Resolve merge conflict in README"',
+            explain: 'This creates a "merge commit" with two parents. The conflict is resolved!'
+        },
+        {
+            task: 'Delete the merged branch (cleanup)',
+            cmd: 'git branch -d feature/header',
+            expected: /git branch -d feature\/header/,
+            hint: 'git branch -d feature/header',
+            explain: 'After merging, delete the feature branch to keep your repo clean. Use -D to force-delete unmerged branches.'
+        },
+    ]
+},
+
+'m11': {
+    title: '11. Remote Repositories — Push, Pull, Clone',
+    level: 'intermediate',
+    concepts: [
+        'A <b>remote</b> is a version of your repo hosted on a server (GitHub, GitLab, Bitbucket).',
+        '<code>origin</code> is the conventional name for your primary remote.',
+        '<code>push</code> sends your commits up. <code>pull</code> brings remote changes down.',
+    ],
+    setup: g => {
+        g.reset(); g.init();
+        g.createFile('README.md', '# Project'); g.add('.'); g.commit('Init');
+    },
+    steps: [
+        {
+            task: 'Add a remote called "origin"',
+            cmd: 'git remote add origin https://github.com/user/project.git',
+            expected: /git remote add origin .+/,
+            hint: 'git remote add origin https://github.com/user/project.git',
+            explain: 'This tells Git where the remote server is. You can have multiple remotes (origin, upstream, etc.).'
+        },
+        {
+            task: 'Verify the remote was added',
+            cmd: 'git remote -v',
+            expected: 'git remote -v',
+            hint: 'git remote -v',
+            explain: '-v (verbose) shows the full URLs for fetch and push operations.'
+        },
+        {
+            task: 'Push your code to the remote',
+            cmd: 'git push -u origin main',
+            expected: /git push/,
+            hint: 'git push -u origin main',
+            explain: '-u (--set-upstream) links your local "main" to "origin/main". After this, just "git push" works.'
+        },
+        {
+            task: 'Fetch changes from the remote',
+            cmd: 'git fetch origin',
+            expected: 'git fetch origin',
+            hint: 'git fetch origin',
+            explain: 'Fetch downloads remote changes but does NOT merge them. It updates your remote-tracking branches.'
+        },
+        {
+            task: 'Pull changes (fetch + merge)',
+            cmd: 'git pull origin main',
+            expected: /git pull/,
+            hint: 'git pull origin main',
+            explain: '"git pull" = "git fetch" + "git merge". It downloads AND integrates remote changes.'
+        },
+        {
+            task: 'Clone an existing repository',
+            cmd: 'git clone https://github.com/user/project.git',
+            expected: /git clone .+/,
+            hint: 'git clone https://github.com/user/project.git',
+            explain: 'Clone creates a full copy of a remote repo, including all history, branches, and tags.'
+        },
+    ]
+},
+
+'m12': {
+    title: '12. Fetch vs Pull — Understanding the Difference',
+    level: 'intermediate',
+    concepts: [
+        '<code>git fetch</code> downloads but does NOT change your working files. Safe to run anytime.',
+        '<code>git pull</code> = fetch + merge. It CAN cause merge conflicts.',
+        'Best practice: <code>fetch</code> first, review changes, then <code>merge</code> or <code>rebase</code>.',
+    ],
+    setup: g => {
+        g.reset(); g.init();
+        g.createFile('app.js'); g.add('.'); g.commit('Init');
+        g.remotes['origin'] = 'https://github.com/user/project.git';
+    },
+    steps: [
+        {
+            task: 'Fetch remote changes safely',
+            cmd: 'git fetch origin',
+            expected: 'git fetch origin',
+            hint: 'git fetch origin',
+            explain: 'Fetch updates your remote-tracking branches (origin/main) without touching your local branches.'
+        },
+        {
+            task: 'Compare local vs remote',
+            cmd: 'git log main..origin/main --oneline',
+            expected: /git log .+origin\/main/,
+            hint: 'git log main..origin/main --oneline',
+            explain: 'This shows commits that exist on origin/main but not on your local main. Review before merging!'
+        },
+        {
+            task: 'Merge the remote changes manually',
+            cmd: 'git merge origin/main',
+            expected: /git merge origin\/main/,
+            hint: 'git merge origin/main',
+            explain: 'Now you explicitly merge. This gives you full control over when remote changes enter your branch.'
+        },
+        {
+            task: 'Or, pull with rebase (cleaner history)',
+            cmd: 'git pull --rebase origin main',
+            expected: /git pull --rebase/,
+            hint: 'git pull --rebase origin main',
+            explain: 'Rebase replays your local commits ON TOP of the remote changes, creating a linear history.'
+        },
+    ]
+},
+
+'m13': {
+    title: '13. Tagging — Marking Releases',
+    level: 'intermediate',
+    concepts: [
+        '<b>Tags</b> mark specific points in history as important — typically for releases (v1.0, v2.1.3).',
+        '<b>Lightweight tags</b>: just a name pointing to a commit.',
+        '<b>Annotated tags</b> (-a): include a message, author, and date. Preferred for releases.',
+    ],
+    setup: g => {
+        g.reset(); g.init();
+        g.createFile('app.js'); g.add('.'); g.commit('Version 1.0 release');
+    },
+    steps: [
+        {
+            task: 'Create a lightweight tag',
+            cmd: 'git tag v1.0',
+            expected: /git tag v1\.0$/,
+            hint: 'git tag v1.0',
+            explain: 'A lightweight tag is just a named pointer to the current commit. Quick and simple.'
+        },
+        {
+            task: 'List all tags',
+            cmd: 'git tag',
+            expected: /^git tag$/,
+            hint: 'git tag',
+            explain: 'Lists all tags in alphabetical order.'
+        },
+        {
+            task: 'Create an annotated tag with a message',
+            cmd: 'git tag -a v1.1 -m "Bug fix release"',
+            expected: /git tag -a .+ -m ".+"/,
+            hint: 'git tag -a v1.1 -m "Bug fix release"',
+            explain: 'Annotated tags store the tagger name, email, date, and a message. Best practice for releases.'
+        },
+        {
+            task: 'Push all tags to the remote',
+            cmd: 'git push --tags',
+            expected: 'git push --tags',
+            hint: 'git push --tags',
+            explain: 'Tags are NOT pushed by default with "git push". Use --tags to push them all at once.'
+        },
+        {
+            task: 'Delete a tag',
+            cmd: 'git tag -d v1.0',
+            expected: /git tag -d v1\.0/,
+            hint: 'git tag -d v1.0',
+            explain: 'This deletes the tag locally. To delete from remote: "git push origin --delete v1.0".'
+        },
+    ]
+},
+
+'m14': {
+    title: '14. Stashing — Saving Work in Progress',
+    level: 'intermediate',
+    concepts: [
+        '<b>Stash</b> temporarily saves uncommitted changes so you can switch branches cleanly.',
+        'Think of it as a "clipboard" for your work-in-progress.',
+        'Stashes are stored in a stack (LIFO): the most recent stash is on top.',
+    ],
+    setup: g => {
+        g.reset(); g.init();
+        g.createFile('config.txt', 'v1'); g.add('.'); g.commit('Initial config');
+        g.createFile('config.txt', 'v2 - work in progress');
+    },
+    steps: [
+        {
+            task: 'Save your current changes to the stash',
+            cmd: 'git stash',
+            expected: /git stash(?: push|save)?/,
+            hint: 'git stash',
+            explain: 'Your uncommitted changes are saved and your working directory is clean again.'
+        },
+        {
+            task: 'Save with a descriptive message',
+            cmd: 'git stash save "WIP: new config format"',
+            expected: /git stash save ".+"/,
+            hint: 'git stash save "WIP: new config format"',
+            explain: 'Adding a message helps you remember what each stash contains.'
+        },
+        {
+            task: 'List all stashes',
+            cmd: 'git stash list',
+            expected: 'git stash list',
+            hint: 'git stash list',
+            explain: 'Shows all stashed changes with their index numbers: stash@{0}, stash@{1}, etc.'
+        },
+        {
+            task: 'Restore the most recent stash (and remove it)',
+            cmd: 'git stash pop',
+            expected: 'git stash pop',
+            hint: 'git stash pop',
+            explain: '"pop" applies the top stash AND removes it from the stack. Use "apply" to keep the stash.'
+        },
+    ]
+},
+
+'m15': {
+    title: '15. Viewing Differences — Diff & Show',
+    level: 'intermediate',
+    concepts: [
+        '<code>git diff</code> shows line-by-line differences between versions of files.',
+        'Lines starting with <b>+</b> are additions. Lines starting with <b>-</b> are deletions.',
+        '<code>git show</code> displays the details (patch) of a specific commit.',
+    ],
+    setup: g => {
+        g.reset(); g.init();
+        g.createFile('app.js', 'const x = 1;'); g.add('.'); g.commit('Init app');
+        g.createFile('app.js', 'const x = 2;\nconst y = 3;');
+    },
+    steps: [
+        {
+            task: 'View unstaged changes',
+            cmd: 'git diff',
+            expected: 'git diff',
+            hint: 'git diff',
+            explain: 'Shows differences between your working directory and the staging area (index).'
+        },
+        {
+            task: 'Stage the changes',
+            cmd: 'git add app.js',
+            expected: /git add/,
+            hint: 'git add app.js',
+            explain: 'Now the changes are staged. "git diff" will show nothing because working dir matches staging.'
+        },
+        {
+            task: 'View staged changes (vs last commit)',
+            cmd: 'git diff --staged',
+            expected: /git diff --staged/,
+            hint: 'git diff --staged',
+            explain: '"--staged" (or "--cached") compares the staging area against the last commit. Shows what WILL be committed.'
+        },
+        {
+            task: 'View the details of the last commit',
+            cmd: 'git show',
+            expected: 'git show',
+            hint: 'git show',
+            explain: '"git show" displays the commit metadata AND the actual patch (diff) of the most recent commit.'
+        },
+    ]
+},
+
+'m16': {
+    title: '16. Amending & Resetting — Rewriting History',
+    level: 'intermediate',
+    concepts: [
+        '<code>git commit --amend</code> modifies the <b>most recent commit</b> (add files, change message).',
+        '<code>git reset</code> moves HEAD backward, potentially unstaging or discarding commits.',
+        '<code>git revert</code> creates a NEW commit that undoes a previous commit — safe for shared branches.',
+    ],
+    setup: g => {
+        g.reset(); g.init();
+        g.createFile('main.py', 'print("hello")'); g.add('.'); g.commit('Add main script');
+    },
+    steps: [
+        {
+            task: 'Oops, forgot a file! Create it.',
+            cmd: 'echo "tests" > test.py',
+            expected: /echo .+ > test\.py/,
+            hint: 'echo "tests" > test.py',
+            explain: 'We should have included this in the last commit.'
+        },
+        {
+            task: 'Stage the forgotten file',
+            cmd: 'git add test.py',
+            expected: /git add test\.py/,
+            hint: 'git add test.py',
+            explain: 'Stage it so we can amend it into the previous commit.'
+        },
+        {
+            task: 'Amend the last commit to include it',
+            cmd: 'git commit --amend -m "Add main script and tests"',
+            expected: /git commit --amend/,
+            hint: 'git commit --amend -m "Add main script and tests"',
+            explain: 'This replaces the last commit with a new one containing BOTH files. Never amend commits that have been pushed!'
+        },
+        {
+            task: 'Create and commit a bad change',
+            cmd: 'echo "bug" > bug.py',
+            expected: /echo .+ > bug\.py/,
+            hint: 'echo "bug" > bug.py',
+            explain: 'Let\'s create a commit we want to undo.'
+        },
+        {
+            task: 'Stage and commit the bad file',
+            cmd: 'git add . && git commit -m "Introduce bug"',
+            expected: /git commit -m ".+"/,
+            hint: 'git add .\ngit commit -m "Introduce bug"',
+            explain: 'Now we have a bad commit we need to undo.'
+        },
+        {
+            task: 'Safely undo the bad commit with revert',
+            cmd: 'git revert HEAD --no-edit',
+            expected: /git revert/,
+            hint: 'git revert HEAD --no-edit',
+            explain: 'Revert creates a NEW commit that undoes the previous one. This is safe for shared/pushed branches!'
+        },
+    ]
+},
+
+// ---- ADVANCED ----
+'m17': {
+    title: '17. Interactive Rebase — Rewriting History',
+    level: 'advanced',
+    concepts: [
+        '<code>git rebase -i HEAD~n</code> lets you <b>squash, reorder, reword, or drop</b> the last n commits.',
+        'Use rebase to clean up messy commit history BEFORE pushing.',
+        '⚠️ <b>Golden Rule</b>: NEVER rebase commits that have already been pushed and shared.',
+    ],
+    setup: g => {
+        g.reset(); g.init();
+        g.createFile('a.txt'); g.add('.'); g.commit('Add a');
+        g.createFile('b.txt'); g.add('.'); g.commit('Add b');
+        g.createFile('c.txt'); g.add('.'); g.commit('Add c');
+    },
+    steps: [
+        {
+            task: 'Start an interactive rebase for the last 3 commits',
+            cmd: 'git rebase -i HEAD~3',
+            expected: /git rebase -i HEAD~3/,
+            hint: 'git rebase -i HEAD~3',
+            explain: 'This opens an editor showing the last 3 commits with "pick" next to each. You can change "pick" to "squash", "reword", "drop", etc.'
+        },
+        {
+            task: 'Simulate saving the editor to complete the rebase',
+            cmd: 'save-rebase',
+            expected: 'save-rebase',
+            hint: 'Type: save-rebase',
+            explain: 'In a real terminal, you\'d edit the rebase todo list and save/close the editor. Here we simulate that.'
+        },
+        {
+            task: 'Rebase the current branch onto main',
+            cmd: 'git rebase main',
+            expected: 'git rebase main',
+            hint: 'git rebase main',
+            explain: 'Non-interactive rebase replays your commits on top of the target branch, creating a linear history.'
+        },
+    ]
+},
+
+'m18': {
+    title: '18. Cherry-Pick — Selective Commits',
+    level: 'advanced',
+    concepts: [
+        '<code>git cherry-pick &lt;hash&gt;</code> applies a single commit from another branch to your current branch.',
+        'Useful when you need ONE specific fix without merging an entire branch.',
+        'The cherry-picked commit gets a <b>new hash</b> but the same content.',
+    ],
+    setup: g => {
+        g.reset(); g.init();
+        g.createFile('main.py'); g.add('.'); g.commit('Init');
+        g.checkout('-b feature');
+        g.createFile('feat.py'); g.add('.'); g.commit('Add feature');
+        g.createFile('fix.py'); g.add('.'); g.commit('Critical bugfix');
+        g.checkout('main');
+    },
+    steps: [
+        {
+            task: 'View the feature branch commits to find the one you need',
+            cmd: 'git log feature --oneline',
+            expected: /git log feature/,
+            hint: 'git log feature --oneline',
+            explain: 'Identify the commit hash of the specific commit you want to cherry-pick.'
+        },
+        {
+            task: 'Cherry-pick the bugfix commit',
+            cmd: 'git cherry-pick d4e5f6g',
+            expected: /git cherry-pick .+/,
+            hint: 'git cherry-pick d4e5f6g  (use the hash from the log)',
+            explain: 'This applies just that one commit to your current branch (main). The feature stays separate.'
+        },
+        {
+            task: 'View the log to confirm it was applied',
+            cmd: 'git log --oneline',
+            expected: 'git log --oneline',
+            hint: 'git log --oneline',
+            explain: 'The cherry-picked commit now appears on main with a new hash but the same message.'
+        },
+    ]
+},
+
+'m19': {
+    title: '19. Git Bisect — Binary Search for Bugs',
+    level: 'advanced',
+    concepts: [
+        '<code>git bisect</code> performs a <b>binary search</b> through your commit history to find which commit introduced a bug.',
+        'You mark commits as "good" or "bad", and Git automatically narrows down the culprit.',
+        'For a history of 1000 commits, bisect finds the bug in ~10 steps!',
+    ],
+    setup: g => { g.reset(); g.init(); g.createFile('app.py'); g.add('.'); g.commit('Init'); },
+    steps: [
+        {
+            task: 'Start a bisect session',
+            cmd: 'git bisect start',
+            expected: 'git bisect start',
+            hint: 'git bisect start',
+            explain: 'This begins the interactive binary search process.'
+        },
+        {
+            task: 'Mark the current commit as bad (has the bug)',
+            cmd: 'git bisect bad',
+            expected: 'git bisect bad',
+            hint: 'git bisect bad',
+            explain: 'You\'re telling Git: "The bug exists in the current commit."'
+        },
+        {
+            task: 'Mark a known good commit',
+            cmd: 'git bisect good b2c3d4e',
+            expected: /git bisect good .+/,
+            hint: 'git bisect good b2c3d4e',
+            explain: 'You\'re telling Git: "This older commit did NOT have the bug." Git will now check the middle commit.'
+        },
+        {
+            task: 'Test and mark the midpoint commit',
+            cmd: 'git bisect good',
+            expected: /git bisect (good|bad)/,
+            hint: 'git bisect good  (or "git bisect bad" depending on your test)',
+            explain: 'Run your tests, then tell Git if this commit is good or bad. Git picks the next midpoint automatically.'
+        },
+        {
+            task: 'End the bisect session and return to normal',
+            cmd: 'git bisect reset',
+            expected: 'git bisect reset',
+            hint: 'git bisect reset',
+            explain: 'This takes you back to the branch you were on before bisecting. The culprit commit has been found!'
+        },
+    ]
+},
+
+'m20': {
+    title: '20. Reflog — Your Safety Net',
+    level: 'advanced',
+    concepts: [
+        '<code>git reflog</code> records every movement of HEAD — even ones not shown in <code>git log</code>.',
+        'If you accidentally delete a branch, reset too far, or lose commits, <b>reflog can save you</b>.',
+        'Reflog entries expire after 90 days by default.',
+    ],
+    setup: g => {
+        g.reset(); g.init();
+        g.createFile('important.py'); g.add('.'); g.commit('Very important work');
+        g.createFile('more.py'); g.add('.'); g.commit('More work');
+    },
+    steps: [
+        {
+            task: 'View the reflog — all HEAD movements',
+            cmd: 'git reflog',
+            expected: 'git reflog',
+            hint: 'git reflog',
+            explain: 'Unlike "git log" which shows commit history, reflog shows EVERY action: commits, checkouts, resets, rebases, etc.'
+        },
+        {
+            task: 'Simulate a dangerous reset (lose a commit)',
+            cmd: 'git reset --hard HEAD~1',
+            expected: /git reset --hard/,
+            hint: 'git reset --hard HEAD~1',
+            explain: 'This moves HEAD back one commit AND discards changes. The "lost" commit is still in the reflog!'
+        },
+        {
+            task: 'View reflog to find the lost commit',
+            cmd: 'git reflog',
+            expected: 'git reflog',
+            hint: 'git reflog',
+            explain: 'You can see the lost commit\'s hash in the reflog. It hasn\'t been garbage collected yet!'
+        },
+        {
+            task: 'Recover by creating a branch at the lost commit',
+            cmd: 'git checkout -b recovery f6g7h8i',
+            expected: /git checkout -b recovery/,
+            hint: 'git checkout -b recovery f6g7h8i',
+            explain: 'By creating a branch pointing to the lost commit, you\'ve recovered your work! Reflog saved the day.'
+        },
+    ]
+},
+
+'m21': {
+    title: '21. Git Hooks — Automation & Quality Gates',
+    level: 'advanced',
+    concepts: [
+        '<b>Git hooks</b> are scripts that run automatically at specific Git events.',
+        'Stored in <code>.git/hooks/</code>. Common hooks: <code>pre-commit</code>, <code>commit-msg</code>, <code>pre-push</code>.',
+        'Use them to enforce code quality, run tests, validate commit messages, etc.',
+    ],
+    setup: g => { g.reset(); g.init(); },
+    steps: [
+        {
+            task: 'Create a pre-commit hook script',
+            cmd: 'cat > .git/hooks/pre-commit',
+            expected: /cat > \.git\/hooks\/pre-commit/,
+            hint: 'cat > .git/hooks/pre-commit',
+            explain: 'This hook runs before every commit. If it exits non-zero, the commit is rejected.'
+        },
+        {
+            task: 'Make the hook executable',
+            cmd: 'chmod +x .git/hooks/pre-commit',
+            expected: /chmod \+x/,
+            hint: 'chmod +x .git/hooks/pre-commit',
+            explain: 'On Unix/Mac, scripts must be executable. On Windows with Git Bash, this also works.'
+        },
+        {
+            task: 'Test the hook (commit should be rejected)',
+            cmd: 'echo "TODO fix" > file.txt && git add . && git commit -m "test"',
+            expected: /git commit -m ".+"/,
+            hint: 'echo "TODO fix" > file.txt\ngit add .\ngit commit -m "test"',
+            explain: 'Our pre-commit hook checks for TODO comments and rejects the commit if found!'
+        },
+        {
+            task: 'Create a commit-msg hook for message format',
+            cmd: 'cat > .git/hooks/commit-msg',
+            expected: /cat > \.git\/hooks\/commit-msg/,
+            hint: 'cat > .git/hooks/commit-msg',
+            explain: 'This hook validates the commit message format (e.g., requiring "feat:", "fix:", "docs:" prefixes).'
+        },
+    ]
+},
+
+'m22': {
+    title: '22. Git Worktrees — Multiple Branches at Once',
+    level: 'advanced',
+    concepts: [
+        '<b>Worktrees</b> let you check out multiple branches simultaneously in separate directories.',
+        'No need to stash or commit your WIP — just open a new worktree!',
+        'Perfect for: reviewing PRs, applying hotfixes, running parallel builds.',
+    ],
+    setup: g => {
+        g.reset(); g.init();
+        g.createFile('main.py'); g.add('.'); g.commit('Init');
+    },
+    steps: [
+        {
+            task: 'Create a new worktree for a hotfix',
+            cmd: 'git worktree add ../hotfix-workspace hotfix/urgent',
+            expected: /git worktree add/,
+            hint: 'git worktree add ../hotfix-workspace hotfix/urgent',
+            explain: 'This creates a new directory with the hotfix branch checked out. Your main worktree stays untouched!'
+        },
+        {
+            task: 'List all active worktrees',
+            cmd: 'git worktree list',
+            expected: 'git worktree list',
+            hint: 'git worktree list',
+            explain: 'Shows all worktrees with their branches and commit hashes.'
+        },
+        {
+            task: 'Remove the worktree when done',
+            cmd: 'git worktree remove ../hotfix-workspace',
+            expected: /git worktree remove/,
+            hint: 'git worktree remove ../hotfix-workspace',
+            explain: 'Cleanup: removes the directory and unlinks the worktree. The branch still exists.'
+        },
+    ]
+},
+
+'m23': {
+    title: '23. Submodules — Repos Inside Repos',
+    level: 'advanced',
+    concepts: [
+        '<b>Submodules</b> embed one Git repository inside another as a subdirectory.',
+        'Useful for shared libraries, microservices, or vendor code.',
+        'The parent repo only tracks WHICH COMMIT of the submodule to use.',
+    ],
+    setup: g => {
+        g.reset(); g.init();
+        g.createFile('main.py'); g.add('.'); g.commit('Init');
+    },
+    steps: [
+        {
+            task: 'Add a submodule from a remote repo',
+            cmd: 'git submodule add https://github.com/user/lib.git libs/shared',
+            expected: /git submodule add/,
+            hint: 'git submodule add https://github.com/user/lib.git libs/shared',
+            explain: 'This clones the remote repo into libs/shared and creates a .gitmodules config file.'
+        },
+        {
+            task: 'Clone a repo that has submodules',
+            cmd: 'git clone --recurse-submodules https://github.com/user/project.git',
+            expected: /git clone --recurse-submodules/,
+            hint: 'git clone --recurse-submodules https://github.com/user/project.git',
+            explain: '--recurse-submodules automatically initializes and clones all submodules.'
+        },
+        {
+            task: 'Update submodules to latest',
+            cmd: 'git submodule update --remote --merge',
+            expected: /git submodule update/,
+            hint: 'git submodule update --remote --merge',
+            explain: 'This fetches the latest commits from each submodule\'s remote and merges them.'
+        },
+    ]
+},
+
+'m24': {
+    title: '24. Advanced Techniques & Best Practices',
+    level: 'advanced',
+    concepts: [
+        'This capstone module covers GPG signing, filter-repo, patch staging, bundles, and workflows.',
+        '<b>GPG signing</b> proves commit authenticity. <b>filter-repo</b> rewrites history.',
+        '<b>Conventional Commits</b>: feat:, fix:, docs:, chore:, refactor:, test:',
+    ],
+    setup: g => {
+        g.reset(); g.init();
+        g.createFile('config.txt', 'vendor_setup=complete\npurchase_org=1000');
+        g.add('.'); g.commit('Initial setup');
+    },
+    steps: [
+        {
+            task: 'Generate a GPG key for signing',
+            cmd: 'gpg --gen-key',
+            expected: 'gpg --gen-key',
+            hint: 'gpg --gen-key',
+            explain: 'GPG keys provide cryptographic verification that commits are truly from you.'
+        },
+        {
+            task: 'Enable GPG signing for all commits',
+            cmd: 'git config --global commit.gpgsign true',
+            expected: /git config --global commit\.gpgsign true/,
+            hint: 'git config --global commit.gpgsign true',
+            explain: 'After this, all your commits will be automatically signed. GitHub shows a "Verified" badge.'
+        },
+        {
+            task: 'Create a signed commit',
+            cmd: 'git commit -S -m "Verified secure commit"',
+            expected: /git commit -S -m ".+"/,
+            hint: 'git commit -S -m "Verified secure commit"',
+            explain: 'The -S flag explicitly signs this commit. With gpgsign=true, it happens automatically.'
+        },
+        {
+            task: 'Use interactive patch staging',
+            cmd: 'git add --patch config.txt',
+            expected: /git add --patch/,
+            hint: 'git add --patch config.txt',
+            explain: '"--patch" lets you stage SPECIFIC LINES within a file, not the whole file. Ultimate precision!'
+        },
+        {
+            task: 'Remove sensitive data from ALL history',
+            cmd: 'git filter-repo --path passwords.txt --invert-paths',
+            expected: /git filter-repo/,
+            hint: 'git filter-repo --path passwords.txt --invert-paths',
+            explain: 'filter-repo rewrites entire repository history to remove a file from EVERY commit. Use for leaked secrets.'
+        },
+        {
+            task: 'Create a Git bundle for offline transfer',
+            cmd: 'git bundle create project.bundle --all',
+            expected: /git bundle create/,
+            hint: 'git bundle create project.bundle --all',
+            explain: 'Bundles package an entire repo into a single file. Useful for transferring repos without network access.'
+        },
+    ]
+},
+};
+
+// ============================================================
+//  SCRIPTED OUTPUT ENGINE — Realistic Terminal Responses
+// ============================================================
+function getScriptedOutput(input) {
+    const cmd = input.trim();
+
+    // System commands
+    if (cmd === 'git --version') return 'git version 2.47.1';
+    if (cmd === 'git help') return `usage: git [-v | --version] [-h | --help] [-C <path>] [-c <name>=<value>]
+
+These are common Git commands used in various situations:
+
+start a working area
+   clone     Clone a repository into a new directory
+   init      Create an empty Git repository
+
+work on the current change
+   add       Add file contents to the index
+   restore   Restore working tree files
+
+examine the history and state
+   bisect    Use binary search to find the commit that introduced a bug
+   diff      Show changes between commits
+   log       Show commit logs
+   show      Show various types of objects
+   status    Show the working tree status
+
+grow, mark and tweak your common history
+   branch    List, create, or delete branches
+   commit    Record changes to the repository
+   merge     Join two or more development histories together
+   rebase    Reapply commits on top of another base tip
+   reset     Reset current HEAD to the specified state
+   switch    Switch branches
+   tag       Create, list, delete or verify a tag object
+
+collaborate
+   fetch     Download objects and refs from another repository
+   pull      Fetch from and integrate with another repository
+   push      Update remote refs along with associated objects`;
+
+    // Config commands
+    if (cmd.startsWith('git config --global user.name')) return '';
+    if (cmd.startsWith('git config --global user.email')) return '';
+    if (cmd.startsWith('git config --global core.editor')) return '';
+    if (cmd.startsWith('git config --global init.defaultBranch')) return '';
+    if (cmd.startsWith('git config --global alias.')) return '';
+    if (cmd.startsWith('git config --global commit.gpgsign')) return '';
+    if (cmd === 'git config --list') return `user.name=Muhammad Ali
+user.email=ali@example.com
+core.editor=code --wait
+init.defaultbranch=main
+alias.st=status
+alias.lg=log --oneline --graph --decorate --all
+color.ui=auto`;
+
+    // Diff commands
+    if (cmd === 'git diff' || cmd === 'git diff --staged' || cmd === 'git diff --cached') return `diff --git a/app.js b/app.js
+index 8a3b5c7..e4f2d1a 100644
+--- a/app.js
++++ b/app.js
+@@ -1 +1,2 @@
+-const x = 1;
++const x = 2;
++const y = 3;`;
+
+    if (cmd === 'git show') return `commit a1b2c3d (HEAD -> main)
+Author: User <user@example.com>
+Date:   ${new Date().toDateString()}
+
+    Most recent commit
+
+diff --git a/app.js b/app.js
+--- a/app.js
++++ b/app.js
+@@ -0,0 +1 @@
++const x = 1;`;
+
+    if (cmd.includes('git log') && cmd.includes('origin/main')) return `a1b2c3d feat: update API endpoint
+b2c3d4e fix: correct null check`;
+
+    if (cmd === 'git log --show-signature') return `commit a1b2c3d (HEAD -> main)
+gpg: Signature made using RSA key ID ABCDEF1234567890
+gpg: Good signature from "User <user@example.com>"
+Author: User <user@example.com>
+Date:   ${new Date().toDateString()}
+
+    Verified secure commit`;
+
+    if (cmd.startsWith('git blame')) return `a1b2c3d (User ${new Date().toISOString().slice(0,10)} 1) const init = true;
+b2c3d4e (User ${new Date().toISOString().slice(0,10)} 2) const app = require('express')();
+c3d4e5f (User ${new Date().toISOString().slice(0,10)} 3) app.listen(3000);`;
+
+    // Remote commands
+    if (cmd.startsWith('git remote add')) return '';
+    if (cmd === 'git remote -v') return `origin\thttps://github.com/user/project.git (fetch)
+origin\thttps://github.com/user/project.git (push)`;
+    if (cmd.startsWith('git push')) return `Enumerating objects: 6, done.
+Counting objects: 100% (6/6), done.
+Delta compression using up to 8 threads
+Compressing objects: 100% (3/3), done.
+Writing objects: 100% (4/4), 387 bytes | 387.00 KiB/s, done.
+Total 4 (delta 1), reused 0 (delta 0)
+To https://github.com/user/project.git
+ * [new branch]      main -> main
+Branch 'main' set up to track remote branch 'main' from 'origin'.`;
+    if (cmd === 'git fetch origin') return `remote: Enumerating objects: 5, done.
+remote: Counting objects: 100% (5/5), done.
+remote: Total 3 (delta 1), reused 3 (delta 1)
+Unpacking objects: 100% (3/3), done.
+From https://github.com/user/project
+   a1b2c3d..d4e5f6g  main       -> origin/main`;
+    if (cmd.startsWith('git pull')) return `remote: Enumerating objects: 3, done.
+Unpacking objects: 100% (3/3), done.
+From https://github.com/user/project
+   a1b2c3d..d4e5f6g  main       -> origin/main
+Updating a1b2c3d..d4e5f6g
+Fast-forward
+ README.md | 2 ++
+ 1 file changed, 2 insertions(+)`;
+    if (cmd.startsWith('git clone')) return `Cloning into 'project'...
+remote: Enumerating objects: 42, done.
+remote: Counting objects: 100% (42/42), done.
+remote: Compressing objects: 100% (28/28), done.
+remote: Total 42 (delta 12), reused 42 (delta 12)
+Receiving objects: 100% (42/42), 15.2 KiB | 5.07 MiB/s, done.
+Resolving deltas: 100% (12/12), done.`;
+
+    // Merge commands
+    if (cmd.startsWith('git merge origin/main')) return `Updating a1b2c3d..d4e5f6g\nFast-forward\n README.md | 2 ++\n 1 file changed, 2 insertions(+)`;
+
+    // Stash
+    if (cmd === 'git stash' || cmd === 'git stash push') return 'Saved working directory and index state WIP on main: a1b2c3d Latest commit';
+    if (cmd.startsWith('git stash save')) return 'Saved working directory and index state On main: WIP: new config format';
+    if (cmd === 'git stash list') return 'stash@{0}: On main: WIP: new config format\nstash@{1}: WIP on main: a1b2c3d Latest commit';
+    if (cmd === 'git stash pop') return `On branch main
+Changes not staged for commit:
+        modified:   config.txt
+
+Dropped stash@{0} (a1b2c3d4e5f6g7h8i9j0k)`;
+    if (cmd === 'git stash apply') return `On branch main\nChanges reinstated.`;
+    if (cmd === 'git stash drop') return 'Dropped stash@{0} (a1b2c3d4e5f6g7h8i9j0k)';
+
+    // Reset
+    if (cmd.includes('git reset --hard')) return `HEAD is now at a1b2c3d Initial commit
+
+⚠️  WARNING: --hard permanently discards uncommitted changes!
+    Use 'git reflog' to find lost commits.`;
+    if (cmd.includes('git reset --soft')) return '';
+    if (cmd.includes('git reset --mixed') || cmd.match(/git reset HEAD/)) return 'Unstaged changes after reset.';
+
+    // Revert
+    if (cmd.startsWith('git revert')) return `[main c3d4e5f] Revert "Introduce bug"
+ 1 file changed, 0 insertions(+), 1 deletion(-)
+ delete mode 100644 bug.py`;
+
+    // Rebase
+    if (cmd.includes('git rebase -i')) return `pick a1b2c3d Add a
+pick b2c3d4e Add b
+pick c3d4e5f Add c
+
+# Rebase a1b2c3d..c3d4e5f onto a1b2c3d (3 commands)
+#
+# Commands:
+# p, pick   = use commit
+# r, reword = use commit, but edit the commit message
+# e, edit   = use commit, but stop for amending
+# s, squash = use commit, but meld into previous commit
+# f, fixup  = like "squash", but discard this commit's log message
+# d, drop   = remove commit
+#
+# INTERACTIVE EDITOR — Type 'save-rebase' to continue`;
+    if (cmd === 'save-rebase') return `[detached HEAD d4e5f6g] Squashed commits
+Successfully rebased and updated refs/heads/main.`;
+    if (cmd === 'git rebase main') return 'Successfully rebased and updated refs/heads/feature.';
+
+    // Cherry-pick
+    if (cmd.startsWith('git cherry-pick')) return `[main e5f6g7h] Critical bugfix
+ Date: ${new Date().toDateString()}
+ 1 file changed, 1 insertion(+)`;
+
+    // Bisect
+    if (cmd === 'git bisect start') return '';
+    if (cmd === 'git bisect bad') return '';
+    if (cmd.startsWith('git bisect good') && cmd.length > 16) return `Bisecting: 4 revisions left to test after this (roughly 2 steps)
+[e5f6g7h] feat: add data validation`;
+    if (cmd === 'git bisect good') return `d4e5f6g is the first bad commit
+commit d4e5f6g
+Author: User <user@example.com>
+Date:   ${new Date().toDateString()}
+
+    feat: add untested parser
+
+ parser.js | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
+
+🔍 Bug introduced in commit d4e5f6g!`;
+    if (cmd === 'git bisect bad') return `Bisecting: 2 revisions left to test after this\n[c3d4e5f] refactor: extract helper`;
+    if (cmd === 'git bisect reset') return "Previous HEAD position was e5f6g7h\nSwitched to branch 'main'";
+
+    // Reflog
+    if (cmd === 'git reflog') return `a1b2c3d HEAD@{0}: commit: Most recent work
+b2c3d4e HEAD@{1}: commit: More work  
+c3d4e5f HEAD@{2}: commit: Very important work
+d4e5f6g HEAD@{3}: commit (initial): Init`;
+
+    // Hooks
+    if (cmd.startsWith('cat > .git/hooks/')) return '';
+    if (cmd.startsWith('chmod')) return '';
+    if (cmd.includes('commit -m "test"')) return `🔍 Running pre-commit checks...
+❌ ERROR: Found 'TODO' in file.txt (line 1)
+❌ Commit REJECTED. Remove all TODO/FIXME comments first.
+
+hint: Fix the issues above and try again.
+hint: To skip this hook: git commit --no-verify`;
+    if (cmd.includes('commit -m "updated stuff"')) return `❌ ERROR: Invalid commit message format!
+Expected format: <type>: <description>
+Valid types: feat, fix, docs, style, refactor, test, chore
+
+Examples:
+  feat: add user authentication
+  fix: resolve null pointer in parser
+  docs: update API documentation`;
+
+    // Worktree
+    if (cmd.startsWith('git worktree add')) return `Preparing worktree (new branch 'hotfix/urgent')
+HEAD is now at a1b2c3d Init`;
+    if (cmd === 'git worktree list') return `/home/user/project          a1b2c3d [main]
+/home/user/hotfix-workspace b2c3d4e [hotfix/urgent]`;
+    if (cmd.startsWith('git worktree remove')) return '';
+
+    // Submodule
+    if (cmd.startsWith('git submodule add')) return `Cloning into '/home/user/project/libs/shared'...
+remote: Enumerating objects: 15, done.
+remote: Total 15 (delta 3), reused 15 (delta 3)`;
+    if (cmd.startsWith('git clone --recurse-submodules')) return `Cloning into 'project'...
+Submodule 'libs/shared' registered for path 'libs/shared'
+Submodule path 'libs/shared': checked out 'a1b2c3d'`;
+    if (cmd.startsWith('git submodule update')) return "Submodule path 'libs/shared': checked out 'b2c3d4e' (v1.2.0)";
+
+    // GPG
+    if (cmd === 'gpg --gen-key') return `gpg: key ABCDEF1234567890 marked as ultimately trusted
+gpg: directory '/home/user/.gnupg' created
+public and secret key created and signed.
+
+pub   rsa3072 ${new Date().toISOString().slice(0,10)} [SC]
+      ABCDEF1234567890ABCDEF1234567890
+uid                 User <user@example.com>
+sub   rsa3072 ${new Date().toISOString().slice(0,10)} [E]`;
+
+    // Advanced
+    if (cmd.includes('git add --patch')) return `diff --git a/config.txt b/config.txt
+--- a/config.txt
++++ b/config.txt
+@@ -1,2 +1,4 @@
+ vendor_setup=complete
+ purchase_org=1000
++plant=1000
++storage_loc=0001
+
+(1/1) Stage this hunk [y,n,q,a,d,s,e,?]?
+(Type 'y' to stage, 'n' to skip)`;
+    if (cmd.includes('git filter-repo')) return `Parsed 24 commits
+New history rewritten (24 commits changed)
+Completely removed passwords.txt from all 24 commits
+Backup created at .git/filter-repo/`;
+    if (cmd.includes('git bundle create')) return `Enumerating objects: 42, done.
+Counting objects: 100% (42/42), done.
+Compressing objects: 100% (28/28), done.
+Total 42 (delta 12), reused 0 (delta 0)
+project.bundle created successfully (23.7 KiB)`;
+
+    // Restore
+    if (cmd.startsWith('git restore')) return '';
+
+    return null; // Not a scripted command
+}
+
+// ============================================================
+//  UI CONTROLLER
+// ============================================================
+const $ = id => document.getElementById(id);
+const termOutput = $('terminal-output');
+const termInput = $('terminal-input');
+const guideContent = $('guide-content');
+const repoState = $('repo-state');
+const promptPath = $('prompt-path');
+const promptBranch = $('prompt-branch-display');
+const moduleSelect = $('module-select');
+const progressBar = $('progress-bar');
+const progressText = $('progress-text');
+const hintBtn = $('hint-btn');
+const hintDisplay = $('hint-display');
+
+const git = new GitEngine();
+let currentModuleKey = 'm01';
+let currentStepIndex = 0;
+let commandHistory = [];
+let historyIndex = -1;
+let rebaseMode = false;
+let totalCompletedSteps = 0;
+
+// Populate module selector
+(function populateSelect() {
+    const groups = { 'Beginner': [], 'Intermediate': [], 'Advanced': [] };
+    for (const [key, mod] of Object.entries(MODULES)) {
+        const level = mod.level.charAt(0).toUpperCase() + mod.level.slice(1);
+        groups[level].push({ key, title: mod.title });
+    }
+    for (const [label, items] of Object.entries(groups)) {
+        const optgroup = document.createElement('optgroup');
+        optgroup.label = `── ${label} ──`;
+        items.forEach(item => {
+            const opt = document.createElement('option');
+            opt.value = item.key;
+            opt.textContent = item.title;
+            optgroup.appendChild(opt);
+        });
+        moduleSelect.appendChild(optgroup);
+    }
+})();
+
+function escapeHtml(str) {
+    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function formatOutput(text) {
+    let escaped = escapeHtml(text);
+    // Apply custom color tokens
+    escaped = escaped.replace(/\{\{hash\}\}(.*?)\{\{\/hash\}\}/g, '<span class="out-hash">$1</span>');
+    escaped = escaped.replace(/\{\{branch\}\}(.*?)\{\{\/branch\}\}/g, '<span class="out-branch">$1</span>');
+    escaped = escaped.replace(/\{\{added\}\}(.*?)\{\{\/added\}\}/g, '<span class="out-added">$1</span>');
+    escaped = escaped.replace(/\{\{removed\}\}(.*?)\{\{\/removed\}\}/g, '<span class="out-removed">$1</span>');
+    // Color diff output
+    escaped = escaped.replace(/^(\+.+)$/gm, '<span class="out-added">$1</span>');
+    escaped = escaped.replace(/^(\-.+)$/gm, '<span class="out-removed">$1</span>');
+    escaped = escaped.replace(/^(@@.+@@.*)$/gm, '<span class="out-header">$1</span>');
+    escaped = escaped.replace(/^(diff --.+)$/gm, '<span class="text-slate-400">$1</span>');
+    escaped = escaped.replace(/^(index .+)$/gm, '<span class="text-slate-500">$1</span>');
+    // Color warnings and errors
+    escaped = escaped.replace(/(⚠️.*)/g, '<span class="out-warning">$1</span>');
+    escaped = escaped.replace(/(❌.*)/g, '<span class="out-error">$1</span>');
+    escaped = escaped.replace(/(🔍.*)/g, '<span class="text-blue-400">$1</span>');
+    // Color branch references
+    escaped = escaped.replace(/\* (\w[\w\-\/]*)/g, '* <span class="out-branch">$1</span>');
+    return escaped;
+}
+
+function writeCommand(cmd) {
+    const div = document.createElement('div');
+    div.className = 'mt-3';
+    const info = git.getPromptInfo();
+    const branchHtml = info.branch ? `<span class="prompt-sep"> (</span><span class="prompt-branch">${info.branch}</span><span class="prompt-sep">)</span>` : '';
+    div.innerHTML = `<span class="prompt-user">user</span><span class="prompt-at">@</span><span class="prompt-host">git-env</span><span class="prompt-sep">:</span><span class="prompt-path">${info.path}</span>${branchHtml}<span class="prompt-dollar"> $</span> <span class="cmd-text">${escapeHtml(cmd)}</span>`;
+    termOutput.appendChild(div);
+}
+
+function writeOutput(text) {
+    if (!text) return;
+    const div = document.createElement('div');
+    div.className = 'mb-1 text-slate-300';
+    div.innerHTML = formatOutput(text);
+    termOutput.appendChild(div);
+}
+
+function writeSystem(text, type = 'info') {
+    const div = document.createElement('div');
+    const colors = {
+        'info': 'text-slate-400 italic',
+        'success': 'text-emerald-400',
+        'error': 'text-red-400',
+        'task': 'text-blue-400',
     };
+    div.className = `text-xs my-1 ${colors[type] || colors.info}`;
+    div.innerHTML = text;
+    termOutput.appendChild(div);
+}
 
-    /**
-     * UI & INTERACTION LOGIC
-     */
-    const terminalOutput = document.getElementById('terminal-output');
-    const terminalInput = document.getElementById('terminal-input');
-    const guideContent = document.getElementById('guide-content');
-    const repoStateDisplay = document.getElementById('repo-state');
-    const promptBranch = document.getElementById('prompt-branch-container');
-    const moduleSelect = document.getElementById('module-select');
-    const loadBtn = document.getElementById('load-module-btn');
-    const progressText = document.getElementById('lesson-progress');
+function scrollTerminal() {
+    termOutput.scrollTop = termOutput.scrollHeight;
+}
 
-    const git = new GitEngine();
-    let currentModuleKey = 'workflow-1';
-    let currentStepIndex = 0;
+function flashTerminal(type) {
+    const cls = type === 'success' ? 'flash-success' : 'flash-error';
+    termOutput.classList.add(cls);
+    setTimeout(() => termOutput.classList.remove(cls), 600);
+}
 
-    function renderGuide() {
-        const mod = modules[currentModuleKey];
-        const step = mod.steps[currentStepIndex];
-        
-        let html = `
-            <div class="mb-4">
-                <span class="inline-block px-2 py-1 bg-emerald-900/50 text-emerald-400 text-xs rounded mb-2 border border-emerald-800">Active Module</span>
-                <h3 class="font-bold text-white text-base">${mod.title}</h3>
+function updatePrompt() {
+    const info = git.getPromptInfo();
+    promptPath.textContent = info.path;
+    if (info.branch) {
+        promptBranch.innerHTML = `<span class="prompt-sep"> (</span><span class="prompt-branch">${info.branch}</span><span class="prompt-sep">)</span>`;
+    } else {
+        promptBranch.innerHTML = '';
+    }
+}
+
+function updateRepoState() {
+    repoState.innerHTML = `
+        <div><span class="text-slate-500">Repo:</span> ${git.isGitInited ? '<span class="text-emerald-400">✓ Init</span>' : '<span class="text-slate-500">—</span>'}</div>
+        <div><span class="text-slate-500">Branch:</span> <span class="text-pink-400">${git.isGitInited ? git.currentBranch : '—'}</span></div>
+        <div><span class="text-slate-500">Staged:</span> ${git.staging.length > 0 ? '<span class="text-yellow-400">' + git.staging.length + '</span>' : '0'}</div>
+        <div><span class="text-slate-500">Commits:</span> ${git.commits.length}</div>
+        <div><span class="text-slate-500">Branches:</span> ${Object.keys(git.branches).length}</div>
+        <div><span class="text-slate-500">Tags:</span> ${Object.keys(git.tags).length}</div>
+        <div><span class="text-slate-500">Stashes:</span> ${git.stashes.length}</div>
+        <div><span class="text-slate-500">Files:</span> ${Object.keys(git.fs).filter(f=>f!=='.git').length}</div>
+    `;
+}
+
+function updateProgress() {
+    const mod = MODULES[currentModuleKey];
+    const total = mod.steps.length;
+    const pct = total > 0 ? Math.round((currentStepIndex / total) * 100) : 0;
+    progressBar.style.width = pct + '%';
+    progressText.textContent = `${currentStepIndex} / ${total}`;
+}
+
+function renderGuide() {
+    const mod = MODULES[currentModuleKey];
+    const step = mod.steps[currentStepIndex];
+    const levelClass = `level-badge-${mod.level}`;
+
+    let html = `
+        <div class="mb-4">
+            <span class="inline-block px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded-full mb-2 ${levelClass}">${mod.level}</span>
+            <h3 class="font-bold text-white text-sm leading-tight">${mod.title}</h3>
+        </div>
+    `;
+
+    // Concept box
+    if (mod.concepts && mod.concepts.length > 0) {
+        html += `<div class="concept-box p-3 rounded-lg mb-4 text-xs text-slate-300 leading-relaxed space-y-1.5">
+            <div class="font-bold text-indigo-300 text-[10px] uppercase tracking-wider mb-1">💡 Key Concepts</div>`;
+        mod.concepts.forEach(c => html += `<div>• ${c}</div>`);
+        html += `</div>`;
+    }
+
+    // Step list
+    html += `<div class="space-y-2 mb-4">`;
+    mod.steps.forEach((s, i) => {
+        let numClass = 'task-number';
+        let borderClass = 'border-slate-700/40';
+        let bgClass = '';
+        if (i < currentStepIndex) { numClass += ' done'; borderClass = 'border-emerald-800/40'; bgClass = 'bg-emerald-900/10'; }
+        else if (i === currentStepIndex) { numClass += ' active'; borderClass = 'border-blue-700/40'; bgClass = 'bg-blue-900/10'; }
+
+        html += `<div class="flex items-start gap-2.5 p-2 rounded-lg border ${borderClass} ${bgClass} transition-colors">
+            <span class="${numClass}">${i < currentStepIndex ? '✓' : (i + 1)}</span>
+            <div class="flex-1 min-w-0">
+                <div class="text-xs ${i === currentStepIndex ? 'text-white font-semibold' : (i < currentStepIndex ? 'text-emerald-400/70 line-through' : 'text-slate-500')}">${s.task}</div>
+                ${i === currentStepIndex && s.explain ? `<div class="text-[11px] text-slate-400 mt-1 leading-relaxed">${s.explain}</div>` : ''}
             </div>
-        `;
+        </div>`;
+    });
+    html += `</div>`;
 
-        if (step) {
-            html += `
-                <div class="bg-slate-900/50 p-3 rounded-lg border border-slate-700 mb-4">
-                    <div class="text-xs text-slate-400 uppercase tracking-wider font-bold mb-2 flex items-center gap-2">
-                        <div class="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></div> Current Task
-                    </div>
-                    <p class="text-white mb-3">${step.task}</p>
-                    ${step.desc ? `<p class="text-slate-400 text-xs mb-3 italic">${step.desc}</p>` : ''}
-                    <div class="bg-black/50 p-2 rounded text-emerald-400 font-mono text-xs border border-slate-700/50 flex justify-between group">
-                        <span>> ${step.cmd}</span>
-                    </div>
-                </div>
-                
-                <div class="text-xs text-slate-500">
-                    Type the command exactly or roughly matching the expectation to proceed.
-                </div>
-            `;
-            progressText.innerText = `Step ${currentStepIndex + 1}/${mod.steps.length}`;
-        } else {
-            html += `
-                <div class="bg-emerald-900/30 p-4 rounded-lg border border-emerald-800 text-center">
-                    <div class="text-2xl mb-2">🎉</div>
-                    <h4 class="text-emerald-400 font-bold mb-1">Module Completed!</h4>
-                    <p class="text-slate-300 text-xs">Select a new module from the top menu to continue your training.</p>
-                </div>
-            `;
-            progressText.innerText = `Done`;
-        }
-
-        guideContent.innerHTML = html;
-
-        // Update Repo State
-        repoStateDisplay.innerHTML = `
-            <div class="grid grid-cols-2 gap-2">
-                <div><span class="text-slate-500">Init:</span> ${git.isGitInited ? '<span class="text-emerald-400">Yes</span>' : 'No'}</div>
-                <div><span class="text-slate-500">Branch:</span> ${git.currentBranch}</div>
-                <div><span class="text-slate-500">Staged:</span> ${git.staging.length}</div>
-                <div><span class="text-slate-500">Commits:</span> ${git.commits.length}</div>
-                <div><span class="text-slate-500">Remotes:</span> ${Object.keys(git.remotes).length}</div>
-                <div><span class="text-slate-500">Tags:</span> ${Object.keys(git.tags).length}</div>
-            </div>
-        `;
-
-        if (git.isGitInited) {
-            promptBranch.innerHTML = ` <span class="text-slate-500">(</span><span class="prompt-branch">${git.currentBranch}</span><span class="text-slate-500">)</span>`;
-        } else {
-            promptBranch.innerHTML = '';
-        }
+    // Completion message
+    if (currentStepIndex >= mod.steps.length) {
+        html += `<div class="bg-emerald-900/20 border border-emerald-700/40 rounded-xl p-5 text-center">
+            <div class="text-3xl mb-2">🎉</div>
+            <h4 class="text-emerald-400 font-bold text-base mb-1">Module Complete!</h4>
+            <p class="text-slate-400 text-xs mb-3">Excellent work! You've mastered all tasks in this module.</p>
+            <p class="text-slate-500 text-[11px]">Select the next module from the dropdown above to continue learning.</p>
+        </div>`;
     }
 
-    function loadModule(key) {
-        currentModuleKey = key;
-        currentStepIndex = 0;
-        const mod = modules[key];
-        
-        mod.setup(git);
-        
-        terminalOutput.innerHTML = `
-            <div class="text-emerald-400 mb-2">--- Switched to Module: ${mod.title} ---</div>
-            <div class="text-slate-400 mb-4 italic text-xs">Environment state has been automatically configured.</div>
-        `;
-        renderGuide();
+    guideContent.innerHTML = html;
+    updateProgress();
+    updateRepoState();
+    updatePrompt();
+}
+
+function showHint() {
+    const mod = MODULES[currentModuleKey];
+    const step = mod.steps[currentStepIndex];
+    if (!step) { hintDisplay.classList.add('hidden'); return; }
+
+    hintDisplay.classList.remove('hidden');
+    hintDisplay.innerHTML = `<div class="text-[10px] text-teal-400/70 uppercase font-bold mb-1">💡 Hint — Try this command:</div>
+        <div class="bg-black/40 p-2 rounded font-mono text-teal-300 mt-1 whitespace-pre-wrap">${escapeHtml(step.hint || step.cmd)}</div>`;
+}
+
+function hideHint() {
+    hintDisplay.classList.add('hidden');
+}
+
+function loadModule(key) {
+    currentModuleKey = key;
+    currentStepIndex = 0;
+    const mod = MODULES[key];
+    mod.setup(git);
+
+    termOutput.innerHTML = '';
+    writeSystem(`━━━ Module Loaded: ${mod.title} ━━━`, 'success');
+    writeSystem(`Level: ${mod.level.toUpperCase()} | Steps: ${mod.steps.length}`, 'info');
+    if (mod.steps[0]) {
+        writeSystem(`\n▶ Task 1: ${mod.steps[0].task}`, 'task');
     }
+    scrollTerminal();
+    hideHint();
+    renderGuide();
+    moduleSelect.value = key;
+}
 
-    function writeToTerminal(text, type = 'output') {
-        const div = document.createElement('div');
-        div.className = type === 'command' ? 'mt-2' : 'mb-1';
-        
-        if (type === 'command') {
-            const path = git.isGitInited ? ` <span class="text-slate-500">(</span><span class="prompt-branch">${git.currentBranch}</span><span class="text-slate-500">)</span>` : "";
-            div.innerHTML = `<span class="prompt-user">user</span>@<span class="prompt-host">git-bash</span> <span class="prompt-path">~</span>${path}<span class="text-slate-300 ml-1">$</span> ${text}`;
-        } else {
-            let formatted = text
-                .replace(/\x1b\[33m/g, '<span class="text-yellow-400">')
-                .replace(/\x1b\[32m/g, '<span class="text-emerald-400">')
-                .replace(/\x1b\[0m/g, '</span>');
-            div.innerHTML = formatted;
+function processCommand(rawInput) {
+    const lines = rawInput.split('\n').map(l => l.trim()).filter(l => l);
+    if (lines.length === 0) return;
+
+    lines.forEach(cmd => {
+        if (!cmd) return;
+
+        // Add to history
+        commandHistory.push(cmd);
+        historyIndex = commandHistory.length;
+
+        writeCommand(cmd);
+
+        if (cmd === 'clear') {
+            termOutput.innerHTML = '';
+            renderGuide();
+            return;
         }
-        
-        terminalOutput.appendChild(div);
-        terminalOutput.scrollTop = terminalOutput.scrollHeight;
-    }
-
-    function processBashCommand(input) {
-        // Handle echo "text" > file
-        const echoMatch = input.match(/^echo\s+"([^"]*)"\s*>\s*(.+)$/);
-        if (echoMatch) {
-            git.createFile(echoMatch[2].trim(), echoMatch[1]);
-            return "";
-        }
-        
-        // Handle gpg
-        if (input.startsWith('gpg --gen-key')) {
-            git.gpgConfigured = true;
-            return "Generating public/private rsa key pair.\nYour keys have been created securely.";
-        }
-
-        return `bash: command not found: ${input.split(' ')[0]}`;
-    }
-
-    function processCommand(rawInput) {
-        const input = rawInput.trim();
-        if (!input) return;
-
-        writeToTerminal(input, 'command');
-
-        if (input === 'clear') {
-            terminalOutput.innerHTML = "";
+        if (cmd === 'help') {
+            writeOutput(`Available commands:
+  git init          Initialize a new repository
+  git status        Show working tree status
+  git add <file>    Stage changes
+  git commit -m ""  Record changes
+  git log           Show commit history
+  git branch        List/create branches
+  git checkout      Switch branches
+  git merge         Merge branches
+  git diff          Show changes
+  git stash         Stash changes
+  git tag           Manage tags
+  git remote        Manage remotes
+  git push/pull     Sync with remote
+  git reset         Reset HEAD
+  git revert        Revert a commit
+  git rebase        Rebase commits
+  git cherry-pick   Apply specific commit
+  git bisect        Binary search for bugs
+  git reflog        Show HEAD movements
+  clear             Clear terminal
+  help              Show this help`);
+            scrollTerminal();
             return;
         }
 
-        let response = "";
+        // Try scripted output first
+        let output = getScriptedOutput(cmd);
 
-        if (input.startsWith('git ')) {
-            const parts = input.split(/\s+/);
-            const cmd = parts[1];
-            const args = parts.slice(2);
-            const argStr = args.join(' ');
-
-            switch(cmd) {
-                case 'init': response = git.init(args.includes('--bare')); break;
-                case 'clone': response = git.clone(args[0]); break;
-                case 'status': response = git.status(); break;
-                case 'add': response = git.add(argStr); break;
-                case 'commit': 
-                    const isAmend = args.includes('--amend');
-                    const isSign = args.includes('-S');
-                    const msgMatch = input.match(/-m\s+"([^"]+)"/);
-                    if (msgMatch) response = git.commit(msgMatch[1], isAmend, isSign);
-                    else if (isAmend && !msgMatch) response = git.commit("Amended commit", true, isSign); // Mocking interactive editor
-                    else response = "error: switch `m' requires a value";
-                    break;
-                case 'log': response = git.log(args); break;
-                case 'blame': response = `1a2b3c4d (Learner 2026-03-12 1) const init = true;`; break;
-                case 'diff': response = git.diff(); break;
-                case 'show': response = git.show(); break;
-                case 'clean': response = git.clean(args); break;
-                case 'tag': response = git.tag(args[0]); break;
-                case 'remote': response = git.remote(args[0], args[1], args[2]); break;
-                case 'push': response = git.push(); break;
-                case 'branch': response = git.branch(args[0]); break;
-                case 'checkout': response = git.checkout(args[0]); break;
-                case 'config': 
-                    if(args.includes('commit.gpgsign') && args.includes('true')) git.gpgConfigured = true;
-                    response = ""; 
-                    break;
-                default: response = `git: '${cmd}' is not a git command.`;
-            }
-        } else {
-            response = processBashCommand(input);
+        // If not scripted, use the engine
+        if (output === null) {
+            output = executeOnEngine(cmd);
         }
 
-        if (response) writeToTerminal(response);
-        
-        checkTaskProgress(input);
-        renderGuide();
-    }
+        if (output && output !== '') {
+            writeOutput(output);
+        }
 
-    function checkTaskProgress(input) {
-        const mod = modules[currentModuleKey];
-        if (currentStepIndex >= mod.steps.length) return;
-        
-        const step = mod.steps[currentStepIndex];
-        let isCorrect = false;
+        // Handle side effects
+        handleSideEffects(cmd);
+    });
 
-        if (step.expected instanceof RegExp) {
-            isCorrect = step.expected.test(input);
-        } else {
-            // For echo commands, be a bit forgiving with quotes
-            if(input.startsWith('echo') && step.expected.startsWith('echo')) {
-                isCorrect = input.replace(/"/g,'').trim() === step.expected.replace(/"/g,'').trim();
+    // Check step completion against the full raw input
+    checkStepCompletion(rawInput);
+    renderGuide();
+    scrollTerminal();
+}
+
+function executeOnEngine(cmd) {
+    if (cmd.startsWith('echo')) {
+        const match = cmd.match(/^echo\s+"([^"]*)"\s*(>|>>)\s*(.+)$/);
+        if (match) {
+            const content = match[1];
+            const op = match[2];
+            const file = match[3].trim();
+            if (op === '>>') {
+                const existing = git.fs[file] ? git.fs[file].content : '';
+                git.createFile(file, existing + '\n' + content);
             } else {
-                isCorrect = input.toLowerCase() === step.expected.toLowerCase();
+                git.createFile(file, content);
             }
+            return '';
         }
-
-        if (isCorrect) {
-            currentStepIndex++;
-            if (currentStepIndex < mod.steps.length) {
-                setTimeout(() => {
-                    writeToTerminal(`\n\x1b[32m[Task Complete]\x1b[0m Next: ${mod.steps[currentStepIndex].task}\n`);
-                }, 300);
-            }
-        }
+        return '';
     }
 
-    // Event Listeners
-    terminalInput.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-            const val = terminalInput.value;
-            terminalInput.value = "";
-            processCommand(val);
+    if (cmd.startsWith('mkdir') && cmd.includes('cd')) {
+        const cdMatch = cmd.match(/cd\s+(\S+)/);
+        if (cdMatch) git.dir = '~/' + cdMatch[1];
+        return '';
+    }
+    if (cmd.startsWith('cd ')) {
+        git.dir = cmd.split('cd ')[1].trim();
+        return '';
+    }
+    if (cmd.startsWith('mkdir')) return '';
+    if (cmd.startsWith('ls')) {
+        const items = Object.keys(git.fs).filter(f => f !== '.git');
+        return items.length > 0 ? items.join('  ') : '';
+    }
+    if (cmd.startsWith('cat ') && !cmd.includes('>')) {
+        const file = cmd.replace('cat ', '').trim();
+        return git.fs[file] ? git.fs[file].content : `cat: ${file}: No such file or directory`;
+    }
+
+    if (!cmd.startsWith('git ')) {
+        return `bash: ${cmd.split(' ')[0]}: command not found`;
+    }
+
+    const parts = cmd.split(/\s+/);
+    const action = parts[1];
+    const args = parts.slice(2).join(' ');
+
+    switch (action) {
+        case 'init': return git.init();
+        case 'status': {
+            const result = git.status();
+            return typeof result === 'object' ? result.text : result;
         }
-    });
-
-    loadBtn.addEventListener('click', () => {
-        loadModule(moduleSelect.value);
-        terminalInput.focus();
-    });
-
-    document.addEventListener('click', (e) => {
-        if (!e.target.closest('#module-select') && !e.target.closest('#load-module-btn')) {
-            terminalInput.focus();
+        case 'add': return git.add(args);
+        case 'commit': {
+            const isAmend = args.includes('--amend');
+            const isSign = args.includes('-S');
+            const isAll = args.includes('-a') || args.includes('-am');
+            let message = '';
+            const msgMatch = cmd.match(/-m\s+"([^"]+)"/);
+            const amMatch = cmd.match(/-am\s+"([^"]+)"/);
+            if (msgMatch) message = msgMatch[1];
+            else if (amMatch) message = amMatch[1];
+            else if (isAmend) message = 'Amended commit';
+            else return 'error: switch `m\' requires a value';
+            return git.commit(message, { amend: isAmend, sign: isSign, all: isAll });
         }
-    });
+        case 'log': return git.log(args);
+        case 'branch': return git.branch(args);
+        case 'checkout': return git.checkout(args);
+        case 'switch': return git.switchBranch(args);
+        case 'merge': return git.merge(args);
+        case 'tag': return git.tag(args);
+        case 'stash': return git.stash(args);
+        case 'remote': return git.remote(args);
+        case 'restore': return git.restore(args);
+        case 'config': {
+            // Store config values in engine
+            const cfgMatch = cmd.match(/git config (?:--global\s+)?(\S+)\s+"?([^"]+)"?/);
+            if (cfgMatch) {
+                git.config[cfgMatch[1]] = cfgMatch[2];
+            }
+            return '';
+        }
+        default: return `git: '${action}' is not a git command. See 'git help'.`;
+    }
+}
 
-    // Init
-    window.onload = () => { 
-        loadModule('workflow-1'); 
-    };
+function handleSideEffects(cmd) {
+    // Handle file creation from multi-command lines
+    if (cmd.includes('&&')) {
+        const parts = cmd.split('&&').map(p => p.trim());
+        parts.forEach(p => {
+            if (p.startsWith('echo') || p.startsWith('git add') || p.startsWith('git commit')) {
+                executeOnEngine(p);
+            }
+        });
+    }
+    if (cmd === 'gpg --gen-key') git.gpgConfigured = true;
+}
+
+function checkStepCompletion(rawInput) {
+    const mod = MODULES[currentModuleKey];
+    if (currentStepIndex >= mod.steps.length) return;
+
+    const step = mod.steps[currentStepIndex];
+    const normalizedInput = rawInput.replace(/\n/g, ' ').trim();
+
+    let match = false;
+    if (step.expected instanceof RegExp) {
+        match = step.expected.test(normalizedInput);
+    } else {
+        // Check each line of input against expected
+        const inputLines = rawInput.split('\n').map(l => l.trim()).filter(l => l);
+        match = inputLines.some(line => line.toLowerCase() === step.expected.toLowerCase()) ||
+                normalizedInput.toLowerCase() === step.expected.toLowerCase();
+    }
+
+    if (match) {
+        currentStepIndex++;
+        totalCompletedSteps++;
+        flashTerminal('success');
+
+        if (currentStepIndex < mod.steps.length) {
+            const next = mod.steps[currentStepIndex];
+            setTimeout(() => {
+                writeSystem(`\n✅ Task complete!`, 'success');
+                writeSystem(`▶ Task ${currentStepIndex + 1}: ${next.task}`, 'task');
+                scrollTerminal();
+            }, 200);
+        } else {
+            setTimeout(() => {
+                writeSystem(`\n🎉 Module "${mod.title}" completed! Great job!`, 'success');
+                writeSystem(`Select the next module from the dropdown to continue.`, 'info');
+                scrollTerminal();
+            }, 200);
+        }
+        hideHint();
+    }
+}
+
+// ============================================================
+//  EVENT LISTENERS
+// ============================================================
+termInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+        const val = termInput.value;
+        termInput.value = '';
+        processCommand(val);
+    }
+    else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        if (historyIndex > 0) {
+            historyIndex--;
+            termInput.value = commandHistory[historyIndex];
+        }
+    }
+    else if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        if (historyIndex < commandHistory.length - 1) {
+            historyIndex++;
+            termInput.value = commandHistory[historyIndex];
+        } else {
+            historyIndex = commandHistory.length;
+            termInput.value = '';
+        }
+    }
+    else if (e.key === 'Tab') {
+        e.preventDefault();
+        // Auto-fill from current step hint
+        const mod = MODULES[currentModuleKey];
+        const step = mod.steps[currentStepIndex];
+        if (step) {
+            const cmdToFill = (step.hint || step.cmd).split('\n')[0];
+            termInput.value = cmdToFill;
+        }
+    }
+    else if (e.key === 'l' && e.ctrlKey) {
+        e.preventDefault();
+        termOutput.innerHTML = '';
+    }
+});
+
+termInput.addEventListener('paste', (e) => {
+    e.preventDefault();
+    const text = (e.clipboardData || window.clipboardData).getData('text');
+    processCommand(text);
+});
+
+$('load-module-btn').addEventListener('click', () => {
+    loadModule(moduleSelect.value);
+    termInput.focus();
+});
+
+$('reset-btn').addEventListener('click', () => {
+    loadModule(currentModuleKey);
+    termInput.focus();
+});
+
+hintBtn.addEventListener('click', () => {
+    if (hintDisplay.classList.contains('hidden')) showHint();
+    else hideHint();
+});
+
+document.addEventListener('click', (e) => {
+    if (!e.target.closest('select') && !e.target.closest('button') && !e.target.closest('aside')) {
+        termInput.focus();
+    }
+});
+
+// Initialize
+window.onload = () => {
+    loadModule('m01');
+    termInput.focus();
+};
 </script>
 </body>
 </html>
